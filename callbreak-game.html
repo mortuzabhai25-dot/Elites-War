@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Call Break Royale — 2v2</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-2: #161b22;
+    --accent: #d4af37;
+    --accent-2: #f1c40f;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --teamA: #4cc9f0;
+    --teamB: #f72585;
+    --good: #2ecc71;
+    --bad: #e74c3c;
+    --card-w: 70px;
+    --card-h: 100px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: radial-gradient(ellipse at top, #1a2332 0%, #0d1117 70%);
+    color: var(--text);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #app { width: 100%; height: 100%; position: relative; }
+
+  /* ======= SCREENS ======= */
+  .screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+  /* WELCOME */
+  .welcome-card {
+    background: linear-gradient(145deg, #1c2533, #131a24);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 24px;
+    padding: 40px 30px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .logo h1 {
+    font-size: 38px;
+    background: linear-gradient(135deg, #d4af37, #f1c40f, #d4af37);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+    font-weight: 800;
+  }
+  .logo .sub { color: var(--text-dim); font-size: 13px; letter-spacing: 4px; margin-top: 4px; text-transform: uppercase; }
+  .logo .deck { font-size: 30px; margin: 10px 0; letter-spacing: 8px; }
+  .logo .deck .red { color: #e74c3c; }
+  .input-group { margin-bottom: 14px; }
+  .input-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 16px;
+    transition: all 0.2s;
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #1a1a1a;
+    box-shadow: 0 4px 16px rgba(212,175,55,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
+  .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  .divider { text-align: center; margin: 18px 0; color: var(--text-dim); font-size: 12px; position: relative; }
+  .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(255,255,255,0.1); }
+  .divider::before { left: 0; } .divider::after { right: 0; }
+
+  /* LOBBY */
+  .lobby-wrap { max-width: 600px; width: 100%; }
+  .room-banner {
+    background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 16px;
+    padding: 16px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .room-banner .label { font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; }
+  .room-banner .code { font-size: 32px; font-weight: 800; letter-spacing: 6px; color: var(--text); margin: 4px 0; font-family: 'Courier New', monospace; }
+  .copy-btn { background: rgba(255,255,255,0.08); border: none; color: var(--text-dim); padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+  .copy-btn:hover { background: rgba(255,255,255,0.15); color: var(--text); }
+  .seats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .seat {
+    background: rgba(255,255,255,0.03);
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 16px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .seat:hover { border-color: rgba(212,175,55,0.5); }
+  .seat.filled { background: rgba(255,255,255,0.05); border-style: solid; cursor: default; }
+  .seat.mine { border-color: var(--accent); background: rgba(212,175,55,0.1); }
+  .seat .team-badge { position: absolute; top: 8px; right: 8px; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; letter-spacing: 1px; }
+  .team-A { background: rgba(76,201,240,0.2); color: var(--teamA); }
+  .team-B { background: rgba(247,37,133,0.2); color: var(--teamB); }
+  .seat-label { font-size: 11px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .seat-name { font-size: 18px; font-weight: 600; }
+  .seat-empty { font-size: 13px; color: var(--text-dim); }
+  .theme-picker { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+  .theme-opt {
+    width: 60px; height: 80px; border-radius: 8px; cursor: pointer;
+    border: 3px solid transparent; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: bold;
+  }
+  .theme-opt.selected { border-color: var(--accent); transform: scale(1.05); }
+  .theme-opt[data-theme="classic"] { background: linear-gradient(145deg, #fefcf3, #e8d9a8); color: #1a1a1a; }
+  .theme-opt[data-theme="neon"] { background: #0a0a0a; color: #0ff; box-shadow: inset 0 0 10px #0ff; }
+  .theme-opt[data-theme="minimal"] { background: #fff; color: #222; border-color: #ddd; }
+  .theme-opt[data-theme="luxury"] { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #c0c0c0; }
+  .theme-opt.selected[data-theme] { border-color: var(--accent); }
+
+  /* GAME TABLE */
+  .table-wrap {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+  }
+  .table-wrap.no-chat { grid-template-columns: 1fr; }
+  .table {
+    position: relative;
+    overflow: hidden;
+    background: 
+      radial-gradient(ellipse at center, #0a4a3a 0%, #052e25 100%);
+  }
+  .table.theme-classic { background: radial-gradient(ellipse at center, #1a5d3f 0%, #0d3825 100%); }
+  .table.theme-neon { background: radial-gradient(ellipse at center, #1a0f2e 0%, #050a1a 100%); }
+  .table.theme-minimal { background: radial-gradient(ellipse at center, #2a2a3e 0%, #15151f 100%); }
+  .table.theme-luxury { background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%); }
+  
+  .topbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .scoreboard { display: flex; gap: 14px; align-items: center; }
+  .team-score { display: flex; flex-direction: column; align-items: center; padding: 4px 12px; border-radius: 8px; }
+  .team-score.a { background: rgba(76,201,240,0.1); border: 1px solid var(--teamA); }
+  .team-score.b { background: rgba(247,37,133,0.1); border: 1px solid var(--teamB); }
+  .team-score .label { font-size: 10px; letter-spacing: 2px; }
+  .team-score .val { font-size: 20px; font-weight: 800; }
+  .team-score.a .val { color: var(--teamA); }
+  .team-score.b .val { color: var(--teamB); }
+  .round-info { text-align: center; }
+  .round-info .lbl { font-size: 10px; color: var(--text-dim); letter-spacing: 2px; }
+  .round-info .val { font-size: 14px; font-weight: 600; }
+  .menu-btn { background: rgba(255,255,255,0.08); border: none; color: var(--text); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 18px; }
+
+  /* PLAYER POSITIONS */
+  .player-pos { position: absolute; display: flex; flex-direction: column; align-items: center; }
+  .player-pos.bottom { bottom: 110px; left: 50%; transform: translateX(-50%); }
+  .player-pos.top { top: 60px; left: 50%; transform: translateX(-50%); }
+  .player-pos.left { left: 12px; top: 50%; transform: translateY(-50%); }
+  .player-pos.right { right: 12px; top: 50%; transform: translateY(-50%); }
+  .player-info {
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 6px 12px;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    min-width: 100px;
+    text-align: center;
+  }
+  .player-info.active { border-color: var(--accent); box-shadow: 0 0 20px rgba(212,175,55,0.4); }
+  .player-info.team-A { background: linear-gradient(180deg, rgba(76,201,240,0.15), rgba(0,0,0,0.5)); }
+  .player-info.team-B { background: linear-gradient(180deg, rgba(247,37,133,0.15), rgba(0,0,0,0.5)); }
+  .player-info .name { font-size: 13px; font-weight: 600; }
+  .player-info .stats { font-size: 11px; color: var(--text-dim); display: flex; gap: 8px; justify-content: center; margin-top: 2px; }
+  .player-info .stats .bid { color: var(--accent); }
+  .player-info .stats .won.over { color: var(--bad); }
+  .player-info .stats .won.good { color: var(--good); }
+  .offline-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2ecc71; margin-right: 4px; }
+  .offline-dot.off { background: #555; }
+
+  /* OPPONENT HANDS */
+  .opp-hand { display: flex; gap: 2px; margin-top: 6px; justify-content: center; }
+  .opp-hand.side { flex-direction: column; gap: 2px; }
+  .card-back {
+    width: 30px; height: 42px;
+    border-radius: 4px;
+    background-size: cover;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .opp-hand.side .card-back { width: 42px; height: 30px; }
+
+  /* CARD BACKS PER THEME */
+  .theme-classic .card-back { background: linear-gradient(135deg, #722f37, #4a1c22); position: relative; }
+  .theme-classic .card-back::after { content: '♛'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 14px; }
+  .theme-neon .card-back { background: #0a0a0a; box-shadow: inset 0 0 6px #0ff; border-color: #0ff; }
+  .theme-minimal .card-back { background: linear-gradient(135deg, #f4f4f4, #d8d8d8); border-color: #aaa; }
+  .theme-luxury .card-back { background: linear-gradient(135deg, #16213e, #0a0e1a); border-color: #c0c0c0; box-shadow: inset 0 0 4px rgba(192,192,192,0.3); }
+
+  /* TRICK AREA */
+  .trick-area {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px; height: 240px;
+    pointer-events: none;
+  }
+  .trick-card { position: absolute; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .trick-card.from-bottom { bottom: 0; left: 50%; transform: translateX(-50%); }
+  .trick-card.from-top { top: 0; left: 50%; transform: translateX(-50%); }
+  .trick-card.from-left { left: 0; top: 50%; transform: translateY(-50%); }
+  .trick-card.from-right { right: 0; top: 50%; transform: translateY(-50%); }
+
+  /* MY HAND */
+  .my-hand {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 110px;
+    pointer-events: none;
+  }
+  .my-hand .card { pointer-events: auto; cursor: pointer; transition: all 0.25s; margin: 0 -22px; }
+  .my-hand .card:hover { transform: translateY(-15px); z-index: 100; }
+  .my-hand .card.playable { box-shadow: 0 0 15px rgba(212,175,55,0.6); }
+  .my-hand .card.not-playable { opacity: 0.45; cursor: not-allowed; }
+  .my-hand .card.not-playable:hover { transform: none; }
+
+  /* CARD STYLES */
+  .card {
+    width: var(--card-w); height: var(--card-h);
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    padding: 6px 8px;
+    position: relative;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .card .rank { font-size: 18px; line-height: 1; }
+  .card .suit-corner { font-size: 14px; line-height: 1; }
+  .card .center-suit { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; }
+  .card .bottom { transform: rotate(180deg); align-self: flex-end; }
+  .card .bottom .rank, .card .bottom .suit-corner { display: block; }
+
+  /* THEME: CLASSIC */
+  .card.theme-classic {
+    background: linear-gradient(145deg, #fefcf3, #f5ebd2);
+    border: 1.5px solid #c9a961;
+    color: #1a1a1a;
+    font-family: Georgia, serif;
+  }
+  .card.theme-classic.red-suit { color: #c41e3a; }
+  .card.theme-classic .center-suit { text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+  /* THEME: NEON */
+  .card.theme-neon {
+    background: linear-gradient(145deg, #0f0f1a, #050510);
+    border: 1.5px solid #00fff7;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 0 12px rgba(0,255,247,0.4), 0 4px 12px rgba(0,0,0,0.6);
+  }
+  .card.theme-neon.suit-S { border-color: #00fff7; box-shadow: 0 0 12px rgba(0,255,247,0.5); }
+  .card.theme-neon.suit-S .center-suit, .card.theme-neon.suit-S .suit-corner { color: #00fff7; text-shadow: 0 0 8px #00fff7; }
+  .card.theme-neon.suit-H { border-color: #ff006e; box-shadow: 0 0 12px rgba(255,0,110,0.5); }
+  .card.theme-neon.suit-H .center-suit, .card.theme-neon.suit-H .suit-corner { color: #ff006e; text-shadow: 0 0 8px #ff006e; }
+  .card.theme-neon.suit-D { border-color: #ffbe0b; box-shadow: 0 0 12px rgba(255,190,11,0.5); }
+  .card.theme-neon.suit-D .center-suit, .card.theme-neon.suit-D .suit-corner { color: #ffbe0b; text-shadow: 0 0 8px #ffbe0b; }
+  .card.theme-neon.suit-C { border-color: #8ac926; box-shadow: 0 0 12px rgba(138,201,38,0.5); }
+  .card.theme-neon.suit-C .center-suit, .card.theme-neon.suit-C .suit-corner { color: #8ac926; text-shadow: 0 0 8px #8ac926; }
+
+  /* THEME: MINIMAL */
+  .card.theme-minimal {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    color: #1a1a1a;
+    font-family: 'Inter', -apple-system, sans-serif;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+  .card.theme-minimal.red-suit { color: #dc2626; }
+  .card.theme-minimal .rank { font-weight: 700; font-size: 16px; }
+
+  /* THEME: LUXURY */
+  .card.theme-luxury {
+    background: linear-gradient(145deg, #1a1a2e, #0d0d1a);
+    border: 1px solid #c0c0c0;
+    color: #f5f5f5;
+    font-family: Georgia, serif;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(192,192,192,0.2);
+  }
+  .card.theme-luxury.red-suit { color: #ff6b8a; }
+  .card.theme-luxury.suit-S .center-suit { background: linear-gradient(135deg, #fff, #c0c0c0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* TIMER */
+  .timer-ring {
+    position: absolute;
+    width: 50px; height: 50px;
+    top: -6px; right: -6px;
+  }
+  .timer-ring svg { transform: rotate(-90deg); }
+  .timer-ring circle { fill: none; stroke-width: 4; }
+  .timer-ring .bg-ring { stroke: rgba(255,255,255,0.1); }
+  .timer-ring .progress-ring { stroke: var(--accent); transition: stroke-dashoffset 1s linear, stroke 0.3s; }
+  .timer-ring.urgent .progress-ring { stroke: var(--bad); }
+  .timer-ring .time-text { fill: var(--text); font-size: 16px; font-weight: bold; text-anchor: middle; transform: rotate(90deg); transform-origin: 25px 25px; }
+
+  /* BID MODAL */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal {
+    background: linear-gradient(145deg, #1c2533, #131a24);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .modal h2 { font-size: 22px; margin-bottom: 8px; }
+  .modal .sub { color: var(--text-dim); font-size: 13px; margin-bottom: 20px; }
+  .bid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .bid-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    padding: 16px 0;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .bid-btn:hover { background: var(--accent); color: #1a1a1a; transform: scale(1.05); }
+  .bid-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* CHAT */
+  .chat-panel {
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(10px);
+    border-left: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+  .chat-header h3 { font-size: 14px; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .chat-msg { font-size: 13px; padding: 6px 10px; border-radius: 10px; max-width: 90%; word-wrap: break-word; }
+  .chat-msg.system { color: var(--text-dim); font-size: 11px; text-align: center; align-self: center; font-style: italic; }
+  .chat-msg.mine { align-self: flex-end; background: rgba(212,175,55,0.2); }
+  .chat-msg.team-A { background: rgba(76,201,240,0.15); }
+  .chat-msg.team-B { background: rgba(247,37,133,0.15); }
+  .chat-msg .author { font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 2px; }
+  .chat-input-wrap { padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 6px; }
+  .chat-input-wrap input { padding: 10px 12px; font-size: 13px; }
+  .chat-input-wrap button { padding: 0 14px; background: var(--accent); border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(212,175,55,0.3);
+    z-index: 1000;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
+  /* WINNER OVERLAY */
+  .winner-screen { 
+    background: radial-gradient(circle, rgba(212,175,55,0.2), rgba(0,0,0,0.95));
+    text-align: center;
+  }
+  .winner-screen .trophy { font-size: 80px; margin-bottom: 20px; }
+  .winner-screen h1 { font-size: 42px; background: linear-gradient(135deg, #d4af37, #f1c40f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  .winner-screen .final-score { font-size: 18px; color: var(--text-dim); margin-bottom: 30px; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    :root { --card-w: 55px; --card-h: 78px; }
+    .table-wrap { grid-template-columns: 1fr; }
+    .chat-panel { display: none; }
+    .chat-panel.show {
+      display: flex;
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+    }
+    .player-pos.bottom { bottom: 90px; }
+    .my-hand .card { margin: 0 -28px; }
+    .card .rank { font-size: 14px; }
+    .card .center-suit { font-size: 24px; }
+    .trick-area { width: 180px; height: 200px; }
+    .opp-hand .card-back { width: 22px; height: 32px; }
+    .opp-hand.side .card-back { width: 32px; height: 22px; }
+  }
+
+  .pulse { animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .deal-anim { animation: dealIn 0.4s ease forwards; opacity: 0; }
+  @keyframes dealIn { to { opacity: 1; } }
+  
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getDatabase, ref, set, get, update, onValue, push, onDisconnect, serverTimestamp, off, remove } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+
+// ========= FIREBASE CONFIG — REPLACE THIS =========
+const firebaseConfig = {
+  apiKey: "AIzaSyArWVks8_fSZPfD0QbuiL-k0o3HbHPSN88",
+  authDomain: "elites-war.firebaseapp.com",
+  databaseURL: "https://elites-war-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "elites-war",
+  storageBucket: "elites-war.firebasestorage.app",
+  messagingSenderId: "118649090531",
+  appId: "1:118649090531:web:246366f972935c8e8170d6",
+  measurementId: "G-9CPXWHXBWZ"
+};
+// ===================================================
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+
+// ========= STATE =========
+const state = {
+  screen: 'welcome',
+  myName: localStorage.getItem('cb_name') || '',
+  myUid: localStorage.getItem('cb_uid') || ('p_' + Math.random().toString(36).slice(2, 10)),
+  roomCode: '',
+  mySeat: null,
+  room: null,
+  cardTheme: localStorage.getItem('cb_theme') || 'classic',
+  showChat: false,
+  pendingBid: false,
+};
+localStorage.setItem('cb_uid', state.myUid);
+
+let roomUnsubscribe = null;
+let timerInterval = null;
+
+// ========= CARD LOGIC =========
+const RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+const SUITS = ['S','H','D','C'];
+const SUIT_SYMBOL = { S: '♠', H: '♥', D: '♦', C: '♣' };
+const RANK_DISPLAY = { T: '10' };
+
+function buildDeck() {
+  const deck = [];
+  for (const s of SUITS) for (const r of RANKS) deck.push(r + s);
+  return deck;
+}
+
+function secureShuffle(arr) {
+  const a = [...arr];
+  const random = new Uint32Array(a.length);
+  crypto.getRandomValues(random);
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = random[i] % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function deal() {
+  const deck = secureShuffle(buildDeck());
+  return {
+    1: deck.slice(0, 13).sort(cardSorter),
+    2: deck.slice(13, 26).sort(cardSorter),
+    3: deck.slice(26, 39).sort(cardSorter),
+    4: deck.slice(39, 52).sort(cardSorter),
+  };
+}
+
+function cardSorter(a, b) {
+  const sa = SUITS.indexOf(a[1]), sb = SUITS.indexOf(b[1]);
+  if (sa !== sb) return sa - sb;
+  return RANKS.indexOf(a[0]) - RANKS.indexOf(b[0]);
+}
+
+function rankValue(r) { return RANKS.indexOf(r); }
+
+function validPlays(hand, currentTrick) {
+  if (!currentTrick || !currentTrick.plays || currentTrick.plays.length === 0) {
+    return hand; // Lead anything
+  }
+  const leadSuit = currentTrick.leadSuit;
+  const hasLead = hand.filter(c => c[1] === leadSuit);
+  if (hasLead.length > 0) {
+    // Must follow & if possible play higher of lead suit (Call Break strict rule)
+    const playedLeadCards = currentTrick.plays.filter(p => p[1] === leadSuit).map(p => rankValue(p[0]));
+    const highestPlayed = playedLeadCards.length ? Math.max(...playedLeadCards) : -1;
+    const hasSpadePlayed = currentTrick.plays.some(p => p[1] === 'S');
+    
+    if (!hasSpadePlayed) {
+      const higher = hasLead.filter(c => rankValue(c[0]) > highestPlayed);
+      if (higher.length > 0) return higher;
+    }
+    return hasLead;
+  }
+  const spades = hand.filter(c => c[1] === 'S');
+  if (spades.length > 0 && leadSuit !== 'S') {
+    // Must trump if possible; if spades already played, must play higher spade if possible
+    const playedSpades = currentTrick.plays.filter(p => p[1] === 'S').map(p => rankValue(p[0]));
+    if (playedSpades.length > 0) {
+      const highestSpade = Math.max(...playedSpades);
+      const higher = spades.filter(c => rankValue(c[0]) > highestSpade);
+      if (higher.length > 0) return higher;
+    }
+    return spades;
+  }
+  return hand;
+}
+
+function trickWinner(plays, leadSuit) {
+  // plays: { seat: card }
+  const arr = Object.entries(plays).map(([seat, card]) => ({ seat: +seat, card }));
+  const spades = arr.filter(p => p.card[1] === 'S');
+  let winner;
+  if (spades.length > 0) {
+    winner = spades.reduce((a, b) => rankValue(a.card[0]) > rankValue(b.card[0]) ? a : b);
+  } else {
+    const leadCards = arr.filter(p => p.card[1] === leadSuit);
+    winner = leadCards.reduce((a, b) => rankValue(a.card[0]) > rankValue(b.card[0]) ? a : b);
+  }
+  return winner.seat;
+}
+
+function calcRoundScore(bid, tricks) {
+  if (tricks === bid) return bid;
+  if (tricks === bid + 1) return bid + 0.1;
+  return -bid;
+}
+
+function teamOfSeat(seat) { return (seat === 1 || seat === 3) ? 'A' : 'B'; }
+
+// ========= ROOM ACTIONS =========
+async function createRoom() {
+  if (!state.myName.trim()) { toast('Name dao age!'); return; }
+  localStorage.setItem('cb_name', state.myName);
+  const code = Math.random().toString(36).slice(2, 7).toUpperCase();
+  const initial = {
+    code,
+    host: state.myUid,
+    status: 'lobby',
+    cardTheme: state.cardTheme,
+    players: {},
+    chat: {},
+    createdAt: Date.now(),
+  };
+  await set(ref(db, `rooms/${code}`), initial);
+  state.roomCode = code;
+  await takeSeat(1);
+  subscribeRoom();
+  render();
+}
+
+async function joinRoom(code) {
+  if (!state.myName.trim()) { toast('Name dao age!'); return; }
+  if (!code.trim()) { toast('Room code lagbe'); return; }
+  code = code.toUpperCase().trim();
+  localStorage.setItem('cb_name', state.myName);
+  const snap = await get(ref(db, `rooms/${code}`));
+  if (!snap.exists()) { toast('Room paowa jay nai'); return; }
+  state.roomCode = code;
+  subscribeRoom();
+  render();
+}
+
+async function takeSeat(seat) {
+  if (!state.roomCode) return;
+  const playersSnap = await get(ref(db, `rooms/${state.roomCode}/players`));
+  const players = playersSnap.val() || {};
+  // Check if I already have a seat — leave it first
+  for (const [s, p] of Object.entries(players)) {
+    if (p && p.uid === state.myUid && +s !== seat) {
+      await remove(ref(db, `rooms/${state.roomCode}/players/${s}`));
+    }
+  }
+  if (players[seat] && players[seat].uid !== state.myUid) {
+    toast('Seat already taken');
+    return;
+  }
+  await set(ref(db, `rooms/${state.roomCode}/players/${seat}`), {
+    uid: state.myUid,
+    name: state.myName,
+    online: true,
+    seat,
+  });
+  state.mySeat = seat;
+  
+  // Setup disconnect handler
+  onDisconnect(ref(db, `rooms/${state.roomCode}/players/${seat}/online`)).set(false);
+  set(ref(db, `rooms/${state.roomCode}/players/${seat}/online`), true);
+}
+
+async function changeTheme(theme) {
+  state.cardTheme = theme;
+  localStorage.setItem('cb_theme', theme);
+  if (state.roomCode) {
+    await update(ref(db, `rooms/${state.roomCode}`), { cardTheme: theme });
+  }
+  render();
+}
+
+async function startGame() {
+  if (!state.room) return;
+  const players = state.room.players || {};
+  if (Object.keys(players).filter(s => players[s]).length !== 4) {
+    toast('4 jon player lagbe');
+    return;
+  }
+  await beginNewRound(1);
+}
+
+async function beginNewRound(roundNum) {
+  const hands = deal();
+  const dealer = ((roundNum - 1) % 4) + 1;
+  const firstBidder = (dealer % 4) + 1;
+  const roundData = {
+    number: roundNum,
+    dealer,
+    hands,
+    bids: {},
+    currentBidder: firstBidder,
+    currentPlayer: null,
+    tricks: { 1: 0, 2: 0, 3: 0, 4: 0 },
+    currentTrick: null,
+    pastTricks: [],
+    turnStartTime: Date.now(),
+  };
+  await update(ref(db, `rooms/${state.roomCode}`), {
+    status: 'bidding',
+    round: roundData,
+  });
+}
+
+async function submitBid(bid) {
+  if (!state.room || !state.room.round) return;
+  const round = state.room.round;
+  if (round.currentBidder !== state.mySeat) return;
+  const bids = { ...(round.bids || {}), [state.mySeat]: bid };
+  const allBidsIn = [1,2,3,4].every(s => bids[s] != null);
+  const updates = {
+    [`round/bids/${state.mySeat}`]: bid,
+    [`round/turnStartTime`]: Date.now(),
+  };
+  if (allBidsIn) {
+    // Start playing
+    updates['status'] = 'playing';
+    updates['round/currentBidder'] = null;
+    const leader = (round.dealer % 4) + 1;
+    updates['round/currentPlayer'] = leader;
+    updates['round/currentTrick'] = { leadSuit: null, plays: {}, order: [] };
+  } else {
+    let nextBidder = (round.currentBidder % 4) + 1;
+    while (bids[nextBidder] != null) nextBidder = (nextBidder % 4) + 1;
+    updates['round/currentBidder'] = nextBidder;
+  }
+  await update(ref(db, `rooms/${state.roomCode}`), updates);
+}
+
+async function playCard(card) {
+  if (!state.room || !state.room.round) return;
+  const round = state.room.round;
+  if (round.currentPlayer !== state.mySeat) return;
+  const myHand = round.hands[state.mySeat] || [];
+  if (!myHand.includes(card)) return;
+  const trick = round.currentTrick || { leadSuit: null, plays: {}, order: [] };
+  const valid = validPlays(myHand, trick);
+  if (!valid.includes(card)) { toast('Eta khelte parbe na — niyom'); return; }
+
+  const newHand = myHand.filter(c => c !== card);
+  const newPlays = { ...(trick.plays || {}), [state.mySeat]: card };
+  const newOrder = [...(trick.order || []), state.mySeat];
+  const newLead = trick.leadSuit || card[1];
+
+  const updates = {
+    [`round/hands/${state.mySeat}`]: newHand,
+    [`round/currentTrick/plays/${state.mySeat}`]: card,
+    [`round/currentTrick/order`]: newOrder,
+    [`round/currentTrick/leadSuit`]: newLead,
+    [`round/turnStartTime`]: Date.now(),
+  };
+
+  if (newOrder.length === 4) {
+    // Trick complete
+    const winner = trickWinner(newPlays, newLead);
+    const newTricks = { ...round.tricks, [winner]: (round.tricks[winner] || 0) + 1 };
+    updates['round/tricks'] = newTricks;
+    updates['round/lastTrickWinner'] = winner;
+    // Wait briefly then clear (we'll do this via a delayed update by host)
+    setTimeout(async () => {
+      // Total cards played?
+      const handsNow = (await get(ref(db, `rooms/${state.roomCode}/round/hands`))).val();
+      const totalLeft = [1,2,3,4].reduce((s, x) => s + (handsNow[x]?.length || 0), 0);
+      if (totalLeft === 0) {
+        // Round end
+        await endRound(newTricks);
+      } else {
+        await update(ref(db, `rooms/${state.roomCode}`), {
+          'round/currentTrick': { leadSuit: null, plays: {}, order: [] },
+          'round/currentPlayer': winner,
+          'round/turnStartTime': Date.now(),
+        });
+      }
+    }, 1800);
+  } else {
+    const nextPlayer = (state.mySeat % 4) + 1;
+    updates['round/currentPlayer'] = nextPlayer;
+  }
+  await update(ref(db, `rooms/${state.roomCode}`), updates);
+}
+
+async function endRound(tricks) {
+  const round = state.room.round;
+  const bids = round.bids;
+  const seatScores = {};
+  let teamADelta = 0, teamBDelta = 0;
+  for (let s = 1; s <= 4; s++) {
+    const score = calcRoundScore(bids[s], tricks[s]);
+    seatScores[s] = score;
+    if (teamOfSeat(s) === 'A') teamADelta += score; else teamBDelta += score;
+  }
+  const prevScores = state.room.scores || { A: 0, B: 0 };
+  const newScores = {
+    A: +(prevScores.A + teamADelta).toFixed(1),
+    B: +(prevScores.B + teamBDelta).toFixed(1),
+  };
+  const history = state.room.history || [];
+  history.push({
+    round: round.number,
+    bids,
+    tricks,
+    seatScores,
+    deltaA: +teamADelta.toFixed(1),
+    deltaB: +teamBDelta.toFixed(1),
+    totalA: newScores.A,
+    totalB: newScores.B,
+  });
+
+  const targetReached = newScores.A >= 100 || newScores.B >= 100;
+  const updates = {
+    scores: newScores,
+    history,
+    'round/showSummary': true,
+    'round/lastSummary': history[history.length - 1],
+  };
+  if (targetReached) {
+    updates['status'] = 'finished';
+    updates['winner'] = newScores.A > newScores.B ? 'A' : 'B';
+  }
+  await update(ref(db, `rooms/${state.roomCode}`), updates);
+
+  if (!targetReached) {
+    setTimeout(() => beginNewRound(round.number + 1), 6000);
+  }
+}
+
+async function autoPlayIfTurn() {
+  if (!state.room || !state.room.round) return;
+  const round = state.room.round;
+  if (state.room.status === 'bidding' && round.currentBidder === state.mySeat) {
+    // Auto-bid minimum
+    await submitBid(2);
+    toast('Time out — auto bid 2');
+  } else if (state.room.status === 'playing' && round.currentPlayer === state.mySeat) {
+    const myHand = round.hands[state.mySeat] || [];
+    const valid = validPlays(myHand, round.currentTrick);
+    if (valid.length > 0) {
+      const randomCard = valid[Math.floor(Math.random() * valid.length)];
+      await playCard(randomCard);
+      toast('Time out — auto play');
+    }
+  }
+}
+
+async function sendChat(text) {
+  if (!text.trim() || !state.roomCode) return;
+  const chatRef = push(ref(db, `rooms/${state.roomCode}/chat`));
+  await set(chatRef, {
+    seat: state.mySeat,
+    name: state.myName,
+    text: text.trim(),
+    time: Date.now(),
+  });
+}
+
+function subscribeRoom() {
+  if (roomUnsubscribe) roomUnsubscribe();
+  const roomRef = ref(db, `rooms/${state.roomCode}`);
+  const cb = onValue(roomRef, (snap) => {
+    const room = snap.val();
+    if (!room) { state.room = null; state.screen = 'welcome'; render(); return; }
+    state.room = room;
+    // Find my seat
+    if (room.players) {
+      for (const [s, p] of Object.entries(room.players)) {
+        if (p && p.uid === state.myUid) { state.mySeat = +s; break; }
+      }
+    }
+    if (room.cardTheme) state.cardTheme = room.cardTheme;
+    if (room.status === 'lobby') state.screen = 'lobby';
+    else if (room.status === 'finished') state.screen = 'gameover';
+    else state.screen = 'game';
+    render();
+    startTurnTimer();
+  });
+  roomUnsubscribe = () => off(roomRef);
+}
+
+function startTurnTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  const room = state.room;
+  if (!room || !room.round || !room.round.turnStartTime) return;
+  if (room.status !== 'bidding' && room.status !== 'playing') return;
+  
+  timerInterval = setInterval(() => {
+    updateTimerDisplay();
+  }, 250);
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const room = state.room;
+  if (!room || !room.round) return;
+  const elapsed = (Date.now() - room.round.turnStartTime) / 1000;
+  const remaining = Math.max(0, 45 - elapsed);
+  const activeSeat = room.status === 'bidding' ? room.round.currentBidder : room.round.currentPlayer;
+  
+  document.querySelectorAll('.timer-ring').forEach(el => {
+    const seat = +el.dataset.seat;
+    if (seat === activeSeat) {
+      el.style.display = 'block';
+      const circ = el.querySelector('.progress-ring');
+      const text = el.querySelector('.time-text');
+      const dashArray = 2 * Math.PI * 21;
+      const offset = dashArray * (1 - remaining / 45);
+      circ.style.strokeDasharray = dashArray;
+      circ.style.strokeDashoffset = offset;
+      text.textContent = Math.ceil(remaining);
+      el.classList.toggle('urgent', remaining < 10);
+    } else {
+      el.style.display = 'none';
+    }
+  });
+  
+  // Auto-play on timeout (only the active player triggers it)
+  if (remaining === 0 && activeSeat === state.mySeat && !state.pendingBid) {
+    state.pendingBid = true;
+    autoPlayIfTurn().finally(() => { state.pendingBid = false; });
+  }
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// ========= RENDER =========
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'welcome') app.innerHTML = renderWelcome();
+  else if (state.screen === 'lobby') app.innerHTML = renderLobby();
+  else if (state.screen === 'game') app.innerHTML = renderGame();
+  else if (state.screen === 'gameover') app.innerHTML = renderGameOver();
+  bindEvents();
+}
+
+function renderWelcome() {
+  return `
+  <div class="screen">
+    <div class="welcome-card">
+      <div class="logo">
+        <div class="deck"><span>♠</span><span class="red">♥</span><span class="red">♦</span><span>♣</span></div>
+        <h1>Call Break</h1>
+        <div class="sub">Royale · 2v2</div>
+      </div>
+      <div class="input-group">
+        <label>Tomar Name</label>
+        <input type="text" id="nameInput" placeholder="Hasan" value="${escapeHtml(state.myName)}" maxlength="20">
+      </div>
+      <button class="btn btn-primary" id="createBtn">Notun Room Banao</button>
+      <div class="divider">OR</div>
+      <div class="input-group">
+        <label>Room Code</label>
+        <input type="text" id="joinCode" placeholder="XXXXX" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;text-align:center;">
+      </div>
+      <button class="btn btn-secondary" id="joinBtn">Join Korbo</button>
+    </div>
+  </div>`;
+}
+
+function renderLobby() {
+  const room = state.room || {};
+  const players = room.players || {};
+  const seats = [1, 2, 3, 4];
+  return `
+  <div class="screen">
+    <div class="lobby-wrap">
+      <div class="room-banner">
+        <div class="label">Room Code</div>
+        <div class="code">${room.code || ''}</div>
+        <button class="copy-btn" id="copyCode">📋 Copy & Share Link</button>
+      </div>
+      <div class="seats-grid">
+        ${seats.map(s => {
+          const p = players[s];
+          const team = teamOfSeat(s);
+          const isMine = state.mySeat === s;
+          return `
+          <div class="seat ${p ? 'filled' : ''} ${isMine ? 'mine' : ''}" data-seat="${s}">
+            <span class="team-badge team-${team}">Team ${team}</span>
+            <div class="seat-label">Seat ${s}</div>
+            ${p ? `<div class="seat-name">${escapeHtml(p.name)}</div>` 
+                : `<div class="seat-empty">+ Take Seat</div>`}
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="text-align:center; margin-bottom: 10px; color:var(--text-dim); font-size:12px; letter-spacing:2px;">CARD STYLE</div>
+      <div class="theme-picker">
+        ${['classic','neon','minimal','luxury'].map(t => `
+          <div class="theme-opt ${state.cardTheme === t ? 'selected' : ''}" data-theme="${t}">A♠</div>
+        `).join('')}
+      </div>
+      <button class="btn btn-primary" id="startBtn" ${Object.values(players).filter(p=>p).length === 4 ? '' : 'disabled'}>
+        ${Object.values(players).filter(p=>p).length === 4 ? '🎴 Game Shuru Koro' : `${Object.values(players).filter(p=>p).length}/4 Player`}
+      </button>
+      <button class="btn btn-secondary" id="leaveBtn">Beriye Jao</button>
+    </div>
+  </div>`;
+}
+
+function renderGame() {
+  const room = state.room;
+  if (!room) return '<div class="screen">Loading...</div>';
+  const round = room.round || {};
+  const players = room.players || {};
+  const scores = room.scores || { A: 0, B: 0 };
+  const theme = state.cardTheme;
+  
+  const myHand = (round.hands && round.hands[state.mySeat]) || [];
+  const validCards = round.currentTrick ? validPlays(myHand, round.currentTrick) : myHand;
+  const isMyTurn = (room.status === 'playing' && round.currentPlayer === state.mySeat);
+  const isMyBidTurn = (room.status === 'bidding' && round.currentBidder === state.mySeat);
+
+  return `
+  <div class="table-wrap ${state.showChat ? '' : 'no-chat-mobile'}">
+    <div class="table theme-${theme}">
+      <div class="topbar">
+        <div class="scoreboard">
+          <div class="team-score a"><span class="label">TEAM A</span><span class="val">${scores.A}</span></div>
+          <div class="team-score b"><span class="label">TEAM B</span><span class="val">${scores.B}</span></div>
+        </div>
+        <div class="round-info">
+          <div class="lbl">ROUND</div>
+          <div class="val">${round.number || 1} · Target 100</div>
+        </div>
+        <button class="menu-btn" id="toggleChat">💬</button>
+      </div>
+      
+      ${[1,2,3,4].map(seat => renderPlayerPos(seat, players, round, room.status)).join('')}
+      
+      <div class="trick-area">
+        ${round.currentTrick && round.currentTrick.plays ? Object.entries(round.currentTrick.plays).map(([seat, card]) => {
+          const pos = getPosition(+seat);
+          return `<div class="trick-card from-${pos}">${cardHtml(card, theme)}</div>`;
+        }).join('') : ''}
+      </div>
+      
+      <div class="my-hand">
+        ${myHand.map((c, i) => {
+          const playable = isMyTurn && validCards.includes(c);
+          const notPlayable = isMyTurn && !validCards.includes(c);
+          return `<div class="card-wrap" data-card="${c}" style="z-index:${i};">${cardHtml(c, theme, playable, notPlayable)}</div>`;
+        }).join('')}
+      </div>
+      
+      ${isMyBidTurn ? renderBidModal(round) : ''}
+      ${round.showSummary && round.lastSummary ? renderRoundSummary(round.lastSummary, players) : ''}
+    </div>
+    
+    <div class="chat-panel ${state.showChat ? 'show' : ''}">
+      <div class="chat-header">
+        <h3>Chat</h3>
+        <button class="menu-btn" id="closeChat">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        ${renderChatMessages(room.chat || {}, players)}
+      </div>
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Type..." maxlength="200">
+        <button id="sendChat">→</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPlayerPos(seat, players, round, status) {
+  const p = players[seat];
+  if (!p) return '';
+  const pos = getPosition(seat);
+  if (pos === 'bottom') return ''; // me, shown via my-hand
+  const team = teamOfSeat(seat);
+  const bid = round.bids ? round.bids[seat] : null;
+  const tricks = round.tricks ? round.tricks[seat] || 0 : 0;
+  const isActive = (status === 'bidding' && round.currentBidder === seat) || (status === 'playing' && round.currentPlayer === seat);
+  const handCount = round.hands ? (round.hands[seat] || []).length : 13;
+  
+  const wonClass = bid != null ? (tricks > bid + 1 ? 'over' : (tricks === bid || tricks === bid + 1 ? 'good' : '')) : '';
+  
+  return `
+  <div class="player-pos ${pos}">
+    ${pos === 'top' ? renderOppHand(handCount, pos) : ''}
+    <div class="player-info team-${team} ${isActive ? 'active' : ''}" style="position:relative;">
+      <div class="name"><span class="offline-dot ${p.online ? '' : 'off'}"></span>${escapeHtml(p.name)}</div>
+      <div class="stats">
+        ${bid != null ? `<span class="bid">Bid ${bid}</span>` : '<span>Waiting bid</span>'}
+        <span class="won ${wonClass}">Won ${tricks}</span>
+      </div>
+      <div class="timer-ring" data-seat="${seat}" style="display:none;">
+        <svg width="50" height="50">
+          <circle class="bg-ring" cx="25" cy="25" r="21"></circle>
+          <circle class="progress-ring" cx="25" cy="25" r="21"></circle>
+          <text class="time-text" x="25" y="30">45</text>
+        </svg>
+      </div>
+    </div>
+    ${pos !== 'top' ? renderOppHand(handCount, pos) : ''}
+  </div>`;
+}
+
+function renderOppHand(count, pos) {
+  const side = pos === 'left' || pos === 'right';
+  return `<div class="opp-hand ${side ? 'side' : ''}">${Array.from({length: Math.min(count, 13)}).map(() => `<div class="card-back"></div>`).join('')}</div>`;
+}
+
+function getPosition(seat) {
+  if (!state.mySeat) return 'top';
+  const offset = (seat - state.mySeat + 4) % 4;
+  return ['bottom', 'left', 'top', 'right'][offset];
+}
+
+function cardHtml(card, theme, playable = false, notPlayable = false) {
+  const r = card[0], s = card[1];
+  const display = RANK_DISPLAY[r] || r;
+  const sym = SUIT_SYMBOL[s];
+  const isRed = (s === 'H' || s === 'D');
+  const classes = ['card', `theme-${theme}`, `suit-${s}`];
+  if (isRed) classes.push('red-suit');
+  if (playable) classes.push('playable');
+  if (notPlayable) classes.push('not-playable');
+  return `
+  <div class="${classes.join(' ')}" data-card-inner="${card}">
+    <div class="top"><div class="rank">${display}</div><div class="suit-corner">${sym}</div></div>
+    <div class="center-suit">${sym}</div>
+    <div class="bottom"><div class="rank">${display}</div><div class="suit-corner">${sym}</div></div>
+  </div>`;
+}
+
+function renderBidModal(round) {
+  const otherBids = round.bids ? Object.entries(round.bids).filter(([s,b]) => b!=null).map(([s,b]) => `Seat ${s}: ${b}`).join(' · ') : '';
+  return `
+  <div class="modal-overlay">
+    <div class="modal">
+      <h2>🎯 Bid Koro</h2>
+      <div class="sub">Min 2 · Koto trick winabe?</div>
+      ${otherBids ? `<div class="sub" style="color:var(--accent);">${otherBids}</div>` : ''}
+      <div class="bid-options">
+        ${Array.from({length: 12}, (_, i) => i + 2).map(n => `
+          <button class="bid-btn" data-bid="${n}">${n}</button>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderRoundSummary(summary, players) {
+  return `
+  <div class="modal-overlay">
+    <div class="modal">
+      <h2>📊 Round ${summary.round} Shesh</h2>
+      <div style="margin: 20px 0;">
+        ${[1,2,3,4].map(s => {
+          const p = players[s];
+          const score = summary.seatScores[s];
+          const color = score > 0 ? 'var(--good)' : 'var(--bad)';
+          return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+            <span>${escapeHtml(p?.name || 'Seat'+s)} (${teamOfSeat(s)})</span>
+            <span style="color:${color}; font-weight:600;">Bid ${summary.bids[s]} → Won ${summary.tricks[s]} = ${score > 0 ? '+' : ''}${score}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex; justify-content:space-around; font-size:18px; font-weight:700; margin: 10px 0;">
+        <div style="color:var(--teamA);">Team A: ${summary.totalA}</div>
+        <div style="color:var(--teamB);">Team B: ${summary.totalB}</div>
+      </div>
+      <div class="sub">Next round in 6 sec...</div>
+    </div>
+  </div>`;
+}
+
+function renderGameOver() {
+  const room = state.room;
+  const winnerTeam = room.winner;
+  const scores = room.scores;
+  return `
+  <div class="screen winner-screen">
+    <div>
+      <div class="trophy">🏆</div>
+      <h1>Team ${winnerTeam} Wins!</h1>
+      <div class="final-score">A: ${scores.A} · B: ${scores.B}</div>
+      <button class="btn btn-primary" id="newGameBtn" style="max-width:300px;">Notun Game Khelo</button>
+    </div>
+  </div>`;
+}
+
+function renderChatMessages(chat, players) {
+  const msgs = Object.values(chat).sort((a, b) => a.time - b.time);
+  return msgs.map(m => {
+    const isMine = m.seat === state.mySeat;
+    const team = m.seat ? teamOfSeat(m.seat) : null;
+    return `<div class="chat-msg ${isMine ? 'mine' : (team ? 'team-'+team : '')}">
+      ${!isMine ? `<span class="author">${escapeHtml(m.name)}</span>` : ''}
+      ${escapeHtml(m.text)}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ========= EVENT HANDLERS =========
+function bindEvents() {
+  const $ = id => document.getElementById(id);
+  
+  if (state.screen === 'welcome') {
+    const ni = $('nameInput');
+    if (ni) ni.oninput = e => state.myName = e.target.value;
+    if ($('createBtn')) $('createBtn').onclick = createRoom;
+    if ($('joinBtn')) $('joinBtn').onclick = () => joinRoom($('joinCode').value);
+  }
+  
+  if (state.screen === 'lobby') {
+    document.querySelectorAll('.seat').forEach(el => {
+      el.onclick = () => {
+        const seat = +el.dataset.seat;
+        const p = state.room?.players?.[seat];
+        if (!p || p.uid === state.myUid) takeSeat(seat);
+      };
+    });
+    document.querySelectorAll('.theme-opt').forEach(el => {
+      el.onclick = () => changeTheme(el.dataset.theme);
+    });
+    if ($('startBtn')) $('startBtn').onclick = startGame;
+    if ($('copyCode')) $('copyCode').onclick = () => {
+      const url = `${location.origin}${location.pathname}?room=${state.roomCode}`;
+      navigator.clipboard.writeText(url);
+      toast('Link copied!');
+    };
+    if ($('leaveBtn')) $('leaveBtn').onclick = () => {
+      if (state.mySeat) remove(ref(db, `rooms/${state.roomCode}/players/${state.mySeat}`));
+      state.roomCode = ''; state.mySeat = null; state.room = null; state.screen = 'welcome';
+      if (roomUnsubscribe) roomUnsubscribe();
+      render();
+    };
+  }
+  
+  if (state.screen === 'game') {
+    document.querySelectorAll('.bid-btn').forEach(el => {
+      el.onclick = () => submitBid(+el.dataset.bid);
+    });
+    document.querySelectorAll('.my-hand .card-wrap').forEach(el => {
+      el.onclick = () => playCard(el.dataset.card);
+    });
+    if ($('toggleChat')) $('toggleChat').onclick = () => { state.showChat = !state.showChat; render(); };
+    if ($('closeChat')) $('closeChat').onclick = () => { state.showChat = false; render(); };
+    if ($('sendChat')) $('sendChat').onclick = () => {
+      sendChat($('chatInput').value);
+      $('chatInput').value = '';
+    };
+    if ($('chatInput')) $('chatInput').onkeypress = e => {
+      if (e.key === 'Enter') { sendChat(e.target.value); e.target.value = ''; }
+    };
+    // Auto-scroll chat
+    const cm = $('chatMessages');
+    if (cm) cm.scrollTop = cm.scrollHeight;
+  }
+  
+  if (state.screen === 'gameover') {
+    if ($('newGameBtn')) $('newGameBtn').onclick = async () => {
+      await update(ref(db, `rooms/${state.roomCode}`), {
+        status: 'lobby',
+        scores: { A: 0, B: 0 },
+        history: null,
+        round: null,
+        winner: null,
+      });
+    };
+  }
+}
+
+// ========= INIT =========
+const urlParams = new URLSearchParams(location.search);
+const joinFromUrl = urlParams.get('room');
+if (joinFromUrl && state.myName) {
+  joinRoom(joinFromUrl);
+} else if (joinFromUrl) {
+  // Show welcome with code pre-filled
+  state.roomCode = joinFromUrl;
+}
+render();
+if (joinFromUrl && !state.myName) {
+  setTimeout(() => {
+    const ji = document.getElementById('joinCode');
+    if (ji) ji.value = joinFromUrl;
+  }, 50);
+}
+</script>
+</body>
+</html>
