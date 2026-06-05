@@ -6,27 +6,19 @@
 <title>Call Break Royale — 2v2</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --bg-2: #161b22;
-    --accent: #d4af37;
-    --accent-2: #f1c40f;
-    --text: #e6edf3;
-    --text-dim: #8b949e;
-    --teamA: #4cc9f0;
-    --teamB: #f72585;
-    --good: #2ecc71;
-    --bad: #e74c3c;
-    --card-w: 70px;
-    --card-h: 100px;
+    --bg: #0d1117; --bg-2: #161b22;
+    --accent: #d4af37; --accent-2: #f1c40f;
+    --text: #e6edf3; --text-dim: #8b949e;
+    --teamA: #4cc9f0; --teamB: #f72585;
+    --good: #2ecc71; --bad: #e74c3c;
+    --card-w: 70px; --card-h: 100px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: radial-gradient(ellipse at top, #1a2332 0%, #0d1117 70%);
-    color: var(--text);
-    user-select: none;
-    -webkit-user-select: none;
+    color: var(--text); user-select: none; -webkit-user-select: none;
   }
   #app { width: 100%; height: 100%; position: relative; }
 
@@ -36,13 +28,11 @@
   .welcome-card {
     background: linear-gradient(145deg, #1c2533, #131a24);
     border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 24px;
-    padding: 40px 30px;
-    max-width: 420px;
-    width: 100%;
+    border-radius: 24px; padding: 36px 28px;
+    max-width: 420px; width: 100%;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
   }
-  .logo { text-align: center; margin-bottom: 30px; }
+  .logo { text-align: center; margin-bottom: 26px; }
   .logo h1 {
     font-size: 38px;
     background: linear-gradient(135deg, #d4af37, #f1c40f, #d4af37);
@@ -61,8 +51,8 @@
   }
   input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
   .btn {
-    width: 100%; padding: 14px; border: none; border-radius: 12px;
-    font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    width: 100%; padding: 13px; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
     margin-top: 8px; letter-spacing: 0.5px;
   }
   .btn-primary {
@@ -72,8 +62,12 @@
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
   .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
   .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+  .btn-bot {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff;
+    box-shadow: 0 4px 16px rgba(108,92,231,0.3);
+  }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-  .divider { text-align: center; margin: 18px 0; color: var(--text-dim); font-size: 12px; position: relative; }
+  .divider { text-align: center; margin: 16px 0; color: var(--text-dim); font-size: 12px; position: relative; }
   .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(255,255,255,0.1); }
   .divider::before { left: 0; } .divider::after { right: 0; }
 
@@ -82,34 +76,35 @@
   .room-banner {
     background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
     border: 1px solid rgba(212,175,55,0.3); border-radius: 16px;
-    padding: 16px 20px; text-align: center; margin-bottom: 20px;
+    padding: 16px 20px; text-align: center; margin-bottom: 18px;
   }
   .room-banner .label { font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; }
-  .room-banner .code { font-size: 32px; font-weight: 800; letter-spacing: 6px; color: var(--text); margin: 4px 0; font-family: 'Courier New', monospace; }
+  .room-banner .code { font-size: 30px; font-weight: 800; letter-spacing: 6px; color: var(--text); margin: 4px 0; font-family: 'Courier New', monospace; }
   .copy-btn { background: rgba(255,255,255,0.08); border: none; color: var(--text-dim); padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; }
   .copy-btn:hover { background: rgba(255,255,255,0.15); color: var(--text); }
-  .seats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .seats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
   .seat {
     background: rgba(255,255,255,0.03); border: 2px dashed rgba(255,255,255,0.15);
-    border-radius: 14px; padding: 16px; min-height: 90px;
+    border-radius: 14px; padding: 14px; min-height: 88px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s; position: relative;
   }
   .seat:hover { border-color: rgba(212,175,55,0.5); }
   .seat.filled { background: rgba(255,255,255,0.05); border-style: solid; cursor: default; }
   .seat.mine { border-color: var(--accent); background: rgba(212,175,55,0.1); }
+  .seat.bot { background: rgba(108,92,231,0.08); border-color: rgba(108,92,231,0.4); border-style: solid; }
   .seat .team-badge { position: absolute; top: 8px; right: 8px; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; letter-spacing: 1px; }
   .team-A { background: rgba(76,201,240,0.2); color: var(--teamA); }
   .team-B { background: rgba(247,37,133,0.2); color: var(--teamB); }
   .seat-label { font-size: 11px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-  .seat-name { font-size: 18px; font-weight: 600; }
+  .seat-name { font-size: 17px; font-weight: 600; }
   .seat-empty { font-size: 13px; color: var(--text-dim); }
-  .theme-picker { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+  .theme-picker { display: flex; gap: 10px; margin-bottom: 16px; justify-content: center; flex-wrap: wrap; }
   .theme-opt {
-    width: 60px; height: 80px; border-radius: 8px; cursor: pointer;
+    width: 56px; height: 76px; border-radius: 8px; cursor: pointer;
     border: 3px solid transparent; transition: all 0.2s;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; font-weight: bold;
+    font-size: 22px; font-weight: bold;
   }
   .theme-opt.selected { border-color: var(--accent); transform: scale(1.05); }
   .theme-opt[data-theme="classic"] { background: linear-gradient(145deg, #fefcf3, #e8d9a8); color: #1a1a1a; }
@@ -173,6 +168,7 @@
   .player-info .stats .bid { color: var(--accent); }
   .player-info .stats .won.over { color: var(--bad); }
   .player-info .stats .won.good { color: var(--good); }
+  .player-info .bot-tag { font-size: 9px; background: rgba(108,92,231,0.5); padding: 1px 5px; border-radius: 6px; margin-left: 4px; letter-spacing: 0.5px; }
   .offline-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2ecc71; margin-right: 4px; }
   .offline-dot.off { background: #555; }
 
@@ -181,51 +177,65 @@
   .opp-hand.side { flex-direction: column; gap: 2px; }
   .card-back { width: 26px; height: 38px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
   .opp-hand.side .card-back { width: 38px; height: 26px; }
-
-  /* CARD BACKS PER THEME */
   .theme-classic .card-back { background: linear-gradient(135deg, #722f37, #4a1c22); position: relative; }
   .theme-classic .card-back::after { content: '♛'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 14px; }
   .theme-neon .card-back { background: #0a0a0a; box-shadow: inset 0 0 6px #0ff; border-color: #0ff; }
   .theme-minimal .card-back { background: linear-gradient(135deg, #f4f4f4, #d8d8d8); border-color: #aaa; }
   .theme-luxury .card-back { background: linear-gradient(135deg, #16213e, #0a0e1a); border-color: #c0c0c0; box-shadow: inset 0 0 4px rgba(192,192,192,0.3); }
 
-  /* TRICK AREA */
+  /* TRICK AREA + ANIMATIONS */
   .trick-area {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 240px; height: 240px;
-    pointer-events: none;
+    width: 260px; height: 240px; pointer-events: none;
   }
-  .trick-card { position: absolute; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-  .trick-card.from-bottom { bottom: 0; left: 50%; transform: translateX(-50%); }
-  .trick-card.from-top { top: 0; left: 50%; transform: translateX(-50%); }
-  .trick-card.from-left { left: 0; top: 50%; transform: translateY(-50%); }
-  .trick-card.from-right { right: 0; top: 50%; transform: translateY(-50%); }
-  .trick-card.winning { box-shadow: 0 0 24px rgba(212,175,55,0.9); border-radius: 8px; }
+  .trick-card { position: absolute; animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); animation-fill-mode: backwards; }
+  .trick-card.from-bottom { bottom: 8px; left: 50%; transform: translateX(-50%); animation-name: fly-bottom; }
+  .trick-card.from-top { top: 8px; left: 50%; transform: translateX(-50%); animation-name: fly-top; }
+  .trick-card.from-left { left: 8px; top: 50%; transform: translateY(-50%); animation-name: fly-left; }
+  .trick-card.from-right { right: 8px; top: 50%; transform: translateY(-50%); animation-name: fly-right; }
+  .trick-card.winning { box-shadow: 0 0 28px 4px rgba(212,175,55,0.9); border-radius: 8px; }
+  @keyframes fly-bottom {
+    from { transform: translateX(-50%) translateY(140px) rotate(-8deg) scale(0.85); opacity: 0; }
+    60% { opacity: 1; }
+    to { transform: translateX(-50%) translateY(0) rotate(0) scale(1); opacity: 1; }
+  }
+  @keyframes fly-top {
+    from { transform: translateX(-50%) translateY(-140px) rotate(8deg) scale(0.85); opacity: 0; }
+    60% { opacity: 1; }
+    to { transform: translateX(-50%) translateY(0) rotate(0) scale(1); opacity: 1; }
+  }
+  @keyframes fly-left {
+    from { transform: translateY(-50%) translateX(-140px) rotate(-12deg) scale(0.85); opacity: 0; }
+    60% { opacity: 1; }
+    to { transform: translateY(-50%) translateX(0) rotate(0) scale(1); opacity: 1; }
+  }
+  @keyframes fly-right {
+    from { transform: translateY(-50%) translateX(140px) rotate(12deg) scale(0.85); opacity: 0; }
+    60% { opacity: 1; }
+    to { transform: translateY(-50%) translateX(0) rotate(0) scale(1); opacity: 1; }
+  }
 
-  /* MY HAND — FIXED LAYOUT */
+  /* MY HAND */
   .my-hand {
-    position: absolute;
-    bottom: 6px; left: 0; right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    height: 120px;
-    pointer-events: none;
-    padding: 0 4px;
+    position: absolute; bottom: 6px; left: 0; right: 0;
+    display: flex; justify-content: center; align-items: flex-end;
+    height: 120px; pointer-events: none; padding: 0 4px;
   }
   .my-hand .card-wrap {
-    pointer-events: auto;
-    cursor: pointer;
+    pointer-events: auto; cursor: pointer;
     transition: transform 0.2s, opacity 0.2s;
-    margin-left: -28px;
-    position: relative;
+    margin-left: -28px; position: relative;
   }
   .my-hand .card-wrap:first-child { margin-left: 0; }
   .my-hand .card-wrap:hover, .my-hand .card-wrap:active { transform: translateY(-14px); z-index: 100; }
   .my-hand .card-wrap.playable .card { box-shadow: 0 0 16px rgba(212,175,55,0.85), 0 4px 12px rgba(0,0,0,0.4) !important; }
   .my-hand .card-wrap.not-playable { opacity: 0.45; }
   .my-hand .card-wrap.not-playable:hover, .my-hand .card-wrap.not-playable:active { transform: none; }
+  .my-hand .card-wrap.played { animation: card-leave 0.5s ease forwards; }
+  @keyframes card-leave {
+    to { transform: translateY(-200px) scale(0.8); opacity: 0; }
+  }
 
   /* CARD STYLES */
   .card {
@@ -233,9 +243,7 @@
     border-radius: 8px;
     display: flex; flex-direction: column;
     justify-content: space-between;
-    padding: 5px 6px;
-    position: relative;
-    font-weight: bold;
+    padding: 5px 6px; position: relative; font-weight: bold;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   }
   .card .rank { font-size: 16px; line-height: 1; }
@@ -244,21 +252,10 @@
   .card .bottom { transform: rotate(180deg); align-self: flex-end; }
   .card .top, .card .bottom { display: flex; flex-direction: column; align-items: flex-start; }
 
-  /* THEME: CLASSIC */
-  .card.theme-classic {
-    background: linear-gradient(145deg, #fefcf3, #f5ebd2);
-    border: 1.5px solid #c9a961; color: #1a1a1a;
-    font-family: Georgia, serif;
-  }
+  .card.theme-classic { background: linear-gradient(145deg, #fefcf3, #f5ebd2); border: 1.5px solid #c9a961; color: #1a1a1a; font-family: Georgia, serif; }
   .card.theme-classic.red-suit { color: #c41e3a; }
 
-  /* THEME: NEON */
-  .card.theme-neon {
-    background: linear-gradient(145deg, #0f0f1a, #050510);
-    border: 1.5px solid #00fff7; color: #fff;
-    font-family: 'Courier New', monospace;
-    box-shadow: 0 0 8px rgba(0,255,247,0.3), 0 4px 12px rgba(0,0,0,0.6);
-  }
+  .card.theme-neon { background: linear-gradient(145deg, #0f0f1a, #050510); border: 1.5px solid #00fff7; color: #fff; font-family: 'Courier New', monospace; box-shadow: 0 0 8px rgba(0,255,247,0.3), 0 4px 12px rgba(0,0,0,0.6); }
   .card.theme-neon.suit-S { border-color: #00fff7; box-shadow: 0 0 8px rgba(0,255,247,0.4), 0 4px 12px rgba(0,0,0,0.6); }
   .card.theme-neon.suit-S .center-suit, .card.theme-neon.suit-S .suit-corner { color: #00fff7; text-shadow: 0 0 6px #00fff7; }
   .card.theme-neon.suit-H { border-color: #ff006e; box-shadow: 0 0 8px rgba(255,0,110,0.4), 0 4px 12px rgba(0,0,0,0.6); }
@@ -268,38 +265,26 @@
   .card.theme-neon.suit-C { border-color: #8ac926; box-shadow: 0 0 8px rgba(138,201,38,0.4), 0 4px 12px rgba(0,0,0,0.6); }
   .card.theme-neon.suit-C .center-suit, .card.theme-neon.suit-C .suit-corner { color: #8ac926; text-shadow: 0 0 6px #8ac926; }
 
-  /* THEME: MINIMAL */
-  .card.theme-minimal {
-    background: #ffffff; border: 1px solid #e5e5e5;
-    color: #1a1a1a;
-    font-family: 'Inter', -apple-system, sans-serif;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-  }
+  .card.theme-minimal { background: #ffffff; border: 1px solid #e5e5e5; color: #1a1a1a; font-family: 'Inter', -apple-system, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
   .card.theme-minimal.red-suit { color: #dc2626; }
   .card.theme-minimal .rank { font-weight: 700; font-size: 15px; }
 
-  /* THEME: LUXURY */
-  .card.theme-luxury {
-    background: linear-gradient(145deg, #1a1a2e, #0d0d1a);
-    border: 1px solid #c0c0c0; color: #f5f5f5;
-    font-family: Georgia, serif;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(192,192,192,0.2);
-  }
+  .card.theme-luxury { background: linear-gradient(145deg, #1a1a2e, #0d0d1a); border: 1px solid #c0c0c0; color: #f5f5f5; font-family: Georgia, serif; box-shadow: 0 4px 14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(192,192,192,0.2); }
   .card.theme-luxury.red-suit { color: #ff6b8a; }
 
   /* TIMER */
   .timer-ring { position: absolute; width: 42px; height: 42px; top: -6px; right: -6px; }
   .timer-ring svg { transform: rotate(-90deg); }
   .timer-ring circle { fill: rgba(0,0,0,0.7); stroke-width: 3; }
-  .timer-ring .bg-ring { stroke: rgba(255,255,255,0.1); fill: rgba(0,0,0,0.7); }
+  .timer-ring .bg-ring { stroke: rgba(255,255,255,0.1); }
   .timer-ring .progress-ring { fill: none; stroke: var(--accent); transition: stroke-dashoffset 1s linear, stroke 0.3s; }
   .timer-ring.urgent .progress-ring { stroke: var(--bad); }
   .timer-ring .time-text { fill: var(--text); font-size: 14px; font-weight: bold; text-anchor: middle; transform: rotate(90deg); transform-origin: 21px 21px; }
 
-  /* BID MODAL */
+  /* MODAL */
   .modal-overlay {
     position: absolute; inset: 0;
-    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
     z-index: 100; display: flex; align-items: center; justify-content: center;
     padding: 16px;
   }
@@ -308,7 +293,7 @@
     border: 1px solid rgba(212,175,55,0.3); border-radius: 20px;
     padding: 24px; max-width: 380px; width: 100%; text-align: center;
     box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    max-height: 88vh; overflow-y: auto;
+    max-height: 90vh; overflow-y: auto;
   }
   .modal h2 { font-size: 22px; margin-bottom: 8px; }
   .modal .sub { color: var(--text-dim); font-size: 13px; margin-bottom: 18px; }
@@ -320,39 +305,47 @@
   }
   .bid-btn:hover, .bid-btn:active { background: var(--accent); color: #1a1a1a; transform: scale(1.05); }
 
-  /* SCORE SHEET */
-  .score-table {
-    width: 100%; border-collapse: collapse; font-size: 13px;
-    margin-top: 8px;
+  /* SCORE SHEET — SPREADSHEET STYLE */
+  .sheet-modal { max-width: 640px; padding: 18px; text-align: left; }
+  .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .sheet-header h2 { font-size: 18px; }
+  .sheet-wrap {
+    overflow: auto; max-height: 55vh;
+    background: #0a0a0a; border-radius: 8px;
+    border: 1px solid #2a2a2a;
   }
-  .score-table th, .score-table td {
-    padding: 7px 6px; text-align: center;
-    border: 1px solid rgba(255,255,255,0.08);
-    font-weight: 500;
+  .sheet { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
+  .sheet th, .sheet td { padding: 7px 8px; text-align: center; border: 1px solid #2a2a2a; }
+  .sheet th {
+    background: #1a1a1a; color: #b8b8b8;
+    font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    position: sticky; top: 0; z-index: 5;
   }
-  .score-table th {
-    background: rgba(255,255,255,0.06);
-    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-    color: var(--text-dim);
-  }
-  .score-table th.team-A-cell { color: var(--teamA); background: rgba(76,201,240,0.1); }
-  .score-table th.team-B-cell { color: var(--teamB); background: rgba(247,37,133,0.1); }
-  .score-table td.neg { background: rgba(231,76,60,0.25); color: #ff9c9c; font-weight: 700; }
-  .score-table td.bonus { background: rgba(46,204,113,0.18); color: #7fffa6; font-weight: 700; }
-  .score-table td.team-A-cell { background: rgba(76,201,240,0.12); color: var(--teamA); font-weight: 700; }
-  .score-table td.team-B-cell { background: rgba(247,37,133,0.12); color: var(--teamB); font-weight: 700; }
-  .score-table tfoot td { background: rgba(255,255,255,0.05); font-weight: 700; }
+  .sheet th.team-a-col { color: var(--teamA); }
+  .sheet th.team-b-col { color: var(--teamB); }
+  .sheet .row-header { background: #1a1a1a; color: #888; font-weight: 600; width: 36px; }
+  .sheet td { background: #0d0d0d; color: #fff; }
+  .sheet td.cell-neg { background: #c0392b; color: #fff; font-weight: 700; }
+  .sheet td.cell-high { background: #1c5da3; color: #fff; font-weight: 700; }
+  .sheet .sum-cell { background: #1a1a1a; color: #ccc; }
+  .sheet tfoot td { background: #0a3825; color: #2ecc71; font-weight: 700; font-size: 14px; }
+  .sheet tfoot .row-header { background: #0a3825; color: #2ecc71; }
+
+  .team-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .ts-cell { padding: 12px 8px; border-radius: 10px; text-align: center; }
+  .ts-cell .label { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+  .ts-cell .value { font-size: 22px; font-weight: 800; }
+  .ts-team-1 { background: rgba(76,201,240,0.12); border: 1px solid var(--teamA); }
+  .ts-team-1 .value { color: var(--teamA); }
+  .ts-team-2 { background: rgba(247,37,133,0.12); border: 1px solid var(--teamB); }
+  .ts-team-2 .value { color: var(--teamB); }
+  .ts-diff { background: rgba(212,175,55,0.12); border: 1px solid var(--accent); }
+  .ts-diff .value { color: var(--accent); }
 
   /* CHAT */
-  .chat-panel {
-    background: rgba(13,17,23,0.95); backdrop-filter: blur(10px);
-    border-left: 1px solid rgba(255,255,255,0.05);
-    display: flex; flex-direction: column;
-  }
-  .chat-header {
-    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex; justify-content: space-between; align-items: center;
-  }
+  .chat-panel { background: rgba(13,17,23,0.95); backdrop-filter: blur(10px); border-left: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+  .chat-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
   .chat-header h3 { font-size: 14px; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; }
   .chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
   .chat-msg { font-size: 13px; padding: 6px 10px; border-radius: 10px; max-width: 90%; word-wrap: break-word; }
@@ -363,48 +356,27 @@
   .chat-msg .author { font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 2px; }
   .chat-input-wrap { padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 6px; }
   .chat-input-wrap input { padding: 10px 12px; font-size: 13px; }
-  .chat-input-wrap button {
-    padding: 0 14px; background: var(--accent); border: none;
-    border-radius: 10px; cursor: pointer; font-weight: 600; color: #1a1a1a;
-  }
+  .chat-input-wrap button { padding: 0 14px; background: var(--accent); border: none; border-radius: 10px; cursor: pointer; font-weight: 600; color: #1a1a1a; }
 
   /* TOAST */
   .toast {
-    position: fixed; bottom: 130px; left: 50%;
+    position: fixed; bottom: 140px; left: 50%;
     transform: translateX(-50%);
     background: rgba(0,0,0,0.92); color: var(--text);
     padding: 10px 18px; border-radius: 12px;
     border: 1px solid rgba(212,175,55,0.4); z-index: 1000;
     animation: slideUp 0.3s ease;
-    font-size: 14px;
-    text-align: center;
-    max-width: 90%;
+    font-size: 14px; text-align: center; max-width: 90%;
   }
   @keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 
   /* WINNER OVERLAY */
-  .winner-screen {
-    background: radial-gradient(circle, rgba(212,175,55,0.2), rgba(0,0,0,0.95));
-    text-align: center;
-  }
+  .winner-screen { background: radial-gradient(circle, rgba(212,175,55,0.2), rgba(0,0,0,0.95)); text-align: center; }
   .winner-screen .trophy { font-size: 80px; margin-bottom: 16px; animation: bounce 1.5s infinite; }
   @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-  .winner-screen h1 {
-    font-size: 38px;
-    background: linear-gradient(135deg, #d4af37, #f1c40f);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-  }
-  .winner-screen .champion-line {
-    font-size: 20px; color: var(--accent); margin: 14px 0;
-    padding: 14px 18px; background: rgba(212,175,55,0.12);
-    border: 1px solid rgba(212,175,55,0.4); border-radius: 14px;
-  }
-  .winner-screen .loser-line {
-    font-size: 17px; color: #ff7575; margin: 14px 0;
-    padding: 12px 18px; background: rgba(231,76,60,0.12);
-    border: 1px solid rgba(231,76,60,0.4); border-radius: 14px;
-  }
+  .winner-screen h1 { font-size: 38px; background: linear-gradient(135deg, #d4af37, #f1c40f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  .winner-screen .champion-line { font-size: 19px; color: var(--accent); margin: 14px 0; padding: 14px 18px; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); border-radius: 14px; }
+  .winner-screen .loser-line { font-size: 16px; color: #ff7575; margin: 14px 0; padding: 12px 18px; background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.4); border-radius: 14px; }
   .winner-screen .final-score { font-size: 16px; color: var(--text-dim); margin: 16px 0; }
 
   /* MOBILE */
@@ -413,42 +385,35 @@
     .table-wrap { grid-template-columns: 1fr; }
     .chat-panel { display: none; }
     .chat-panel.show { display: flex; position: absolute; inset: 0; z-index: 50; }
-    
     .my-hand { height: 100px; padding: 0 2px; bottom: 4px; }
     .my-hand .card-wrap { margin-left: -32px; }
     .my-hand .card-wrap:first-child { margin-left: 0; }
     .my-hand .card-wrap:hover, .my-hand .card-wrap:active { transform: translateY(-10px); }
-    
     .card { padding: 3px 4px; }
     .card .rank { font-size: 13px; }
     .card .suit-corner { font-size: 11px; }
     .card .center-suit { font-size: 22px; }
-    
-    .trick-area { width: 170px; height: 180px; }
+    .trick-area { width: 200px; height: 200px; }
     .card-back { width: 16px; height: 22px; }
     .opp-hand.side .card-back { width: 22px; height: 16px; }
     .opp-hand { gap: 1px; }
     .opp-hand.side { gap: 1px; }
-    
     .player-pos.top { top: 50px; }
     .player-info { min-width: 86px; padding: 4px 8px; }
     .player-info .name { font-size: 12px; }
     .player-info .stats { font-size: 10px; }
-    
     .topbar { padding: 6px 8px; }
     .team-score { padding: 3px 8px; }
     .team-score .val { font-size: 15px; }
     .round-info .val { font-size: 11px; }
     .menu-btn { width: 30px; height: 30px; font-size: 14px; }
-    
-    .score-table { font-size: 11px; }
-    .score-table th, .score-table td { padding: 5px 3px; }
-    
+    .sheet { font-size: 11px; }
+    .sheet th, .sheet td { padding: 5px 4px; }
     .winner-screen h1 { font-size: 28px; }
-    .winner-screen .champion-line { font-size: 16px; padding: 10px 14px; }
-    .winner-screen .loser-line { font-size: 14px; padding: 10px 14px; }
+    .winner-screen .champion-line { font-size: 15px; padding: 10px 14px; }
+    .winner-screen .loser-line { font-size: 13px; padding: 10px 14px; }
+    .ts-cell .value { font-size: 18px; }
   }
-
   .pulse { animation: pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 </style>
@@ -460,7 +425,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getDatabase, ref, set, get, update, onValue, push, onDisconnect, off, remove } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
 
-// ========= FIREBASE CONFIG — REPLACE THIS =========
+// ========= FIREBASE CONFIG =========
 const firebaseConfig = {
   apiKey: "AIzaSyArWVks8_fSZPfD0QbuiL-k0o3HbHPSN88",
   authDomain: "elites-war.firebaseapp.com",
@@ -471,7 +436,6 @@ const firebaseConfig = {
   appId: "1:118649090531:web:246366f972935c8e8170d6",
   measurementId: "G-9CPXWHXBWZ"
 };
-// ===================================================
 
 const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
@@ -488,32 +452,26 @@ const state = {
   showChat: false,
   showScoreSheet: false,
   pendingAuto: false,
+  advanceScheduled: null,
+  botTimer: null,
 };
 localStorage.setItem('cb_uid', state.myUid);
 
 let roomUnsubscribe = null;
 let timerInterval = null;
 
-// ========= CARD LOGIC =========
+// ========= CARDS =========
 const RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
 const SUITS = ['S','H','D','C'];
 const SUIT_SYMBOL = { S: '♠', H: '♥', D: '♦', C: '♣' };
 const RANK_DISPLAY = { T: '10' };
 
-function buildDeck() {
-  const deck = [];
-  for (const s of SUITS) for (const r of RANKS) deck.push(r + s);
-  return deck;
-}
+function buildDeck() { const d = []; for (const s of SUITS) for (const r of RANKS) d.push(r + s); return d; }
 
 function secureShuffle(arr) {
   const a = [...arr];
-  const random = new Uint32Array(a.length);
-  crypto.getRandomValues(random);
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = random[i] % (i + 1);
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+  const r = new Uint32Array(a.length); crypto.getRandomValues(r);
+  for (let i = a.length - 1; i > 0; i--) { const j = r[i] % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 }
 
@@ -536,9 +494,7 @@ function cardSorter(a, b) {
 function rankValue(r) { return RANKS.indexOf(r); }
 
 function validPlays(hand, currentTrick) {
-  if (!currentTrick || !currentTrick.plays || Object.keys(currentTrick.plays).length === 0) {
-    return hand;
-  }
+  if (!currentTrick || !currentTrick.plays || Object.keys(currentTrick.plays).length === 0) return hand;
   const leadSuit = currentTrick.leadSuit;
   const plays = Object.values(currentTrick.plays || {});
   const hasLead = hand.filter(c => c[1] === leadSuit);
@@ -546,10 +502,7 @@ function validPlays(hand, currentTrick) {
     const playedLeadCards = plays.filter(p => p[1] === leadSuit).map(p => rankValue(p[0]));
     const highestPlayed = playedLeadCards.length ? Math.max(...playedLeadCards) : -1;
     const hasSpadePlayed = plays.some(p => p[1] === 'S');
-    if (!hasSpadePlayed && leadSuit !== 'S') {
-      const higher = hasLead.filter(c => rankValue(c[0]) > highestPlayed);
-      if (higher.length > 0) return higher;
-    } else if (leadSuit === 'S') {
+    if ((!hasSpadePlayed && leadSuit !== 'S') || leadSuit === 'S') {
       const higher = hasLead.filter(c => rankValue(c[0]) > highestPlayed);
       if (higher.length > 0) return higher;
     }
@@ -572,12 +525,8 @@ function trickWinner(plays, leadSuit) {
   const arr = Object.entries(plays).map(([seat, card]) => ({ seat: +seat, card }));
   const spades = arr.filter(p => p.card[1] === 'S');
   let winner;
-  if (spades.length > 0) {
-    winner = spades.reduce((a, b) => rankValue(a.card[0]) > rankValue(b.card[0]) ? a : b);
-  } else {
-    const leadCards = arr.filter(p => p.card[1] === leadSuit);
-    winner = leadCards.reduce((a, b) => rankValue(a.card[0]) > rankValue(b.card[0]) ? a : b);
-  }
+  if (spades.length > 0) winner = spades.reduce((a, b) => rankValue(a.card[0]) > rankValue(b.card[0]) ? a : b);
+  else { const leadCards = arr.filter(p => p.card[1] === leadSuit); winner = leadCards.reduce((a, b) => rankValue(a.card[0]) > rankValue(b.card[0]) ? a : b); }
   return winner.seat;
 }
 
@@ -590,16 +539,14 @@ function calcRoundScore(bid, tricks) {
 
 function teamOfSeat(seat) { return (seat === 1 || seat === 3) ? 'A' : 'B'; }
 
+function isBot(player) { return player && player.uid && player.uid.startsWith('bot_'); }
+
 // ========= ROOM ACTIONS =========
 async function createRoom() {
   if (!state.myName.trim()) { toast('Name dao age!'); return; }
   localStorage.setItem('cb_name', state.myName);
   const code = Math.random().toString(36).slice(2, 7).toUpperCase();
-  const initial = {
-    code, host: state.myUid, status: 'lobby',
-    cardTheme: state.cardTheme, players: {}, chat: {},
-    createdAt: Date.now(),
-  };
+  const initial = { code, host: state.myUid, status: 'lobby', cardTheme: state.cardTheme, players: {}, chat: {}, createdAt: Date.now() };
   await set(ref(db, `rooms/${code}`), initial);
   state.roomCode = code;
   await takeSeat(1);
@@ -624,38 +571,44 @@ async function takeSeat(seat) {
   const playersSnap = await get(ref(db, `rooms/${state.roomCode}/players`));
   const players = playersSnap.val() || {};
   for (const [s, p] of Object.entries(players)) {
-    if (p && p.uid === state.myUid && +s !== seat) {
-      await remove(ref(db, `rooms/${state.roomCode}/players/${s}`));
-    }
+    if (p && p.uid === state.myUid && +s !== seat) await remove(ref(db, `rooms/${state.roomCode}/players/${s}`));
   }
-  if (players[seat] && players[seat].uid !== state.myUid) {
-    toast('Seat already taken');
-    return;
-  }
-  await set(ref(db, `rooms/${state.roomCode}/players/${seat}`), {
-    uid: state.myUid, name: state.myName, online: true, seat,
-  });
+  if (players[seat] && players[seat].uid !== state.myUid) { toast('Seat already taken'); return; }
+  await set(ref(db, `rooms/${state.roomCode}/players/${seat}`), { uid: state.myUid, name: state.myName, online: true, seat });
   state.mySeat = seat;
   onDisconnect(ref(db, `rooms/${state.roomCode}/players/${seat}/online`)).set(false);
   set(ref(db, `rooms/${state.roomCode}/players/${seat}/online`), true);
 }
 
+async function addBots() {
+  if (!state.roomCode) return;
+  const playersSnap = await get(ref(db, `rooms/${state.roomCode}/players`));
+  const players = playersSnap.val() || {};
+  const botNames = ['🤖 Bot Akash', '🤖 Bot Bijoy', '🤖 Bot Chandan'];
+  let botIdx = 0;
+  for (let s = 1; s <= 4 && botIdx < 3; s++) {
+    if (!players[s]) {
+      await set(ref(db, `rooms/${state.roomCode}/players/${s}`), {
+        uid: 'bot_' + Math.random().toString(36).slice(2, 8),
+        name: botNames[botIdx], online: true, seat: s,
+      });
+      botIdx++;
+    }
+  }
+  toast('Bots added! Test korte paro now.');
+}
+
 async function changeTheme(theme) {
   state.cardTheme = theme;
   localStorage.setItem('cb_theme', theme);
-  if (state.roomCode) {
-    await update(ref(db, `rooms/${state.roomCode}`), { cardTheme: theme });
-  }
+  if (state.roomCode) await update(ref(db, `rooms/${state.roomCode}`), { cardTheme: theme });
   render();
 }
 
 async function startGame() {
   if (!state.room) return;
   const players = state.room.players || {};
-  if (Object.keys(players).filter(s => players[s]).length !== 4) {
-    toast('4 jon player lagbe');
-    return;
-  }
+  if (Object.keys(players).filter(s => players[s]).length !== 4) { toast('4 jon player lagbe'); return; }
   await beginNewRound(1);
 }
 
@@ -664,33 +617,24 @@ async function beginNewRound(roundNum) {
   const dealer = ((roundNum - 1) % 4) + 1;
   const firstBidder = (dealer % 4) + 1;
   const roundData = {
-    number: roundNum,
-    dealer,
-    hands,
-    bids: {},
-    currentBidder: firstBidder,
-    currentPlayer: null,
+    number: roundNum, dealer, hands, bids: {},
+    currentBidder: firstBidder, currentPlayer: null,
     tricks: { 1: 0, 2: 0, 3: 0, 4: 0 },
     currentTrick: null,
     turnStartTime: Date.now(),
     showSummary: false,
   };
-  await update(ref(db, `rooms/${state.roomCode}`), {
-    status: 'bidding',
-    round: roundData,
-  });
+  await update(ref(db, `rooms/${state.roomCode}`), { status: 'bidding', round: roundData });
 }
 
-async function submitBid(bid) {
+async function submitBid(bid, asSeat = null) {
+  const seat = asSeat || state.mySeat;
   if (!state.room || !state.room.round) return;
   const round = state.room.round;
-  if (round.currentBidder !== state.mySeat) return;
-  const bids = { ...(round.bids || {}), [state.mySeat]: bid };
+  if (round.currentBidder !== seat) return;
+  const bids = { ...(round.bids || {}), [seat]: bid };
   const allBidsIn = [1,2,3,4].every(s => bids[s] != null);
-  const updates = {
-    [`round/bids/${state.mySeat}`]: bid,
-    [`round/turnStartTime`]: Date.now(),
-  };
+  const updates = { [`round/bids/${seat}`]: bid, [`round/turnStartTime`]: Date.now() };
   if (allBidsIn) {
     updates['status'] = 'playing';
     updates['round/currentBidder'] = null;
@@ -705,45 +649,47 @@ async function submitBid(bid) {
   await update(ref(db, `rooms/${state.roomCode}`), updates);
 }
 
-async function playCard(card) {
+async function playCard(card, asSeat = null) {
+  const seat = asSeat || state.mySeat;
   if (!state.room || !state.room.round) return;
   const round = state.room.round;
-  if (state.room.status !== 'playing') { toast('Game ekhono shuru hoinai'); return; }
-  if (round.currentPlayer !== state.mySeat) {
-    const activeName = state.room.players[round.currentPlayer]?.name || `Seat ${round.currentPlayer}`;
-    toast(`${activeName} er palaa, tumi wait koro`);
+  if (!asSeat && state.room.status !== 'playing') { toast('Game ekhono shuru hoinai'); return; }
+  if (round.currentPlayer !== seat) {
+    if (!asSeat) {
+      const activeName = state.room.players[round.currentPlayer]?.name || `Seat ${round.currentPlayer}`;
+      toast(`${activeName} er palaa, tumi wait koro`);
+    }
     return;
   }
-  const myHand = round.hands[state.mySeat] || [];
-  if (!myHand.includes(card)) { toast('Card nai'); return; }
+  const myHand = round.hands[seat] || [];
+  if (!myHand.includes(card)) { if (!asSeat) toast('Card nai'); return; }
   const trick = round.currentTrick || { leadSuit: '', plays: {}, order: [] };
   const valid = validPlays(myHand, trick);
   if (!valid.includes(card)) {
-    toast('Niyom: ' + (trick.leadSuit ? 'higher card lagbe ba suit follow koro' : 'eta khelte parba na'));
+    if (!asSeat) toast('Niyom: ' + (trick.leadSuit ? 'suit follow koro / higher card khelo' : 'eta khelte parba na'));
     return;
   }
 
   const newHand = myHand.filter(c => c !== card);
-  const newOrder = [...(trick.order || []), state.mySeat];
+  const newOrder = [...(trick.order || []), seat];
   const newLead = trick.leadSuit || card[1];
 
   const updates = {
-    [`round/hands/${state.mySeat}`]: newHand,
-    [`round/currentTrick/plays/${state.mySeat}`]: card,
+    [`round/hands/${seat}`]: newHand,
+    [`round/currentTrick/plays/${seat}`]: card,
     [`round/currentTrick/order`]: newOrder,
     [`round/currentTrick/leadSuit`]: newLead,
     [`round/turnStartTime`]: Date.now(),
   };
 
   if (newOrder.length === 4) {
-    const newPlays = { ...(trick.plays || {}), [state.mySeat]: card };
+    const newPlays = { ...(trick.plays || {}), [seat]: card };
     const winner = trickWinner(newPlays, newLead);
     const newTricks = { ...round.tricks, [winner]: (round.tricks[winner] || 0) + 1 };
     updates['round/tricks'] = newTricks;
     updates['round/lastTrickWinner'] = winner;
-    
     await update(ref(db, `rooms/${state.roomCode}`), updates);
-    
+
     setTimeout(async () => {
       const handsNow = (await get(ref(db, `rooms/${state.roomCode}/round/hands`))).val();
       const totalLeft = [1,2,3,4].reduce((s, x) => s + (handsNow[x]?.length || 0), 0);
@@ -759,7 +705,7 @@ async function playCard(card) {
       }
     }, 1800);
   } else {
-    const nextPlayer = (state.mySeat % 4) + 1;
+    const nextPlayer = (seat % 4) + 1;
     updates['round/currentPlayer'] = nextPlayer;
     await update(ref(db, `rooms/${state.roomCode}`), updates);
   }
@@ -782,30 +728,27 @@ async function endRound(tricks) {
   };
   const history = state.room.history || [];
   history.push({
-    round: round.number,
-    bids, tricks, seatScores,
+    round: round.number, bids, tricks, seatScores,
     sumBids: Object.values(bids).reduce((a, b) => a + b, 0),
-    deltaA: +teamADelta.toFixed(1),
-    deltaB: +teamBDelta.toFixed(1),
-    totalA: newScores.A,
-    totalB: newScores.B,
+    deltaA: +teamADelta.toFixed(1), deltaB: +teamBDelta.toFixed(1),
+    totalA: newScores.A, totalB: newScores.B,
   });
 
   const targetReached = newScores.A >= 100 || newScores.B >= 100;
   const updates = {
-    scores: newScores,
-    history,
+    scores: newScores, history,
     'round/showSummary': true,
     'round/lastSummary': history[history.length - 1],
   };
-  if (targetReached) {
-    updates['status'] = 'finished';
-    updates['winner'] = newScores.A > newScores.B ? 'A' : 'B';
-  }
+  if (targetReached) { updates['status'] = 'finished'; updates['winner'] = newScores.A > newScores.B ? 'A' : 'B'; }
   await update(ref(db, `rooms/${state.roomCode}`), updates);
+}
 
-  if (!targetReached) {
-    setTimeout(() => beginNewRound(round.number + 1), 6500);
+async function tryAdvanceRound(fromRoundNum) {
+  const snap = await get(ref(db, `rooms/${state.roomCode}/round`));
+  const cur = snap.val();
+  if (cur && cur.number === fromRoundNum && cur.showSummary) {
+    await beginNewRound(fromRoundNum + 1);
   }
 }
 
@@ -813,26 +756,82 @@ async function autoPlayIfTurn() {
   if (!state.room || !state.room.round) return;
   const round = state.room.round;
   if (state.room.status === 'bidding' && round.currentBidder === state.mySeat) {
-    await submitBid(2);
-    toast('Time out — auto bid 2');
+    await submitBid(2); toast('Time out — auto bid 2');
   } else if (state.room.status === 'playing' && round.currentPlayer === state.mySeat) {
     const myHand = round.hands[state.mySeat] || [];
     const valid = validPlays(myHand, round.currentTrick);
-    if (valid.length > 0) {
-      const randomCard = valid[Math.floor(Math.random() * valid.length)];
-      await playCard(randomCard);
-      toast('Time out — auto play');
-    }
+    if (valid.length > 0) { await playCard(valid[Math.floor(Math.random() * valid.length)]); toast('Time out — auto play'); }
   }
+}
+
+// ========= BOT LOGIC =========
+function smartBotBid(hand) {
+  // Count spades, high cards as rough estimate
+  let bid = 0;
+  const spades = hand.filter(c => c[1] === 'S');
+  const aces = hand.filter(c => c[0] === 'A').length;
+  const kings = hand.filter(c => c[0] === 'K').length;
+  bid += aces; // Aces likely to win
+  bid += kings * 0.7;
+  bid += Math.max(0, spades.length - 3) * 0.5; // extra spades good
+  bid += spades.filter(c => 'AKQ'.includes(c[0])).length * 0.5;
+  return Math.max(2, Math.min(8, Math.round(bid)));
+}
+
+function smartBotPlay(hand, currentTrick, mySeat) {
+  const valid = validPlays(hand, currentTrick);
+  if (valid.length === 0) return hand[0];
+  if (valid.length === 1) return valid[0];
+  // If we can win cheaply, play lowest winner; else play lowest
+  const plays = Object.values(currentTrick?.plays || {});
+  if (plays.length === 0) {
+    // Lead: play medium low non-spade if possible
+    const nonSpade = valid.filter(c => c[1] !== 'S');
+    const pool = nonSpade.length > 0 ? nonSpade : valid;
+    pool.sort((a, b) => rankValue(a[0]) - rankValue(b[0]));
+    return pool[Math.floor(pool.length / 2)];
+  }
+  // Sort valid asc; pick lowest
+  valid.sort((a, b) => rankValue(a[0]) - rankValue(b[0]));
+  return valid[0];
+}
+
+async function maybeBotAct() {
+  if (state.botTimer) return;
+  if (!state.room || state.myUid !== state.room.host) return;
+  const room = state.room;
+  if (!room.round) return;
+  if (room.round.showSummary) return;
+
+  let action = null;
+  if (room.status === 'bidding' && room.round.currentBidder) {
+    const p = room.players[room.round.currentBidder];
+    if (isBot(p)) action = { seat: room.round.currentBidder, type: 'bid' };
+  } else if (room.status === 'playing' && room.round.currentPlayer) {
+    const p = room.players[room.round.currentPlayer];
+    if (isBot(p)) action = { seat: room.round.currentPlayer, type: 'play' };
+  }
+  if (!action) return;
+
+  state.botTimer = setTimeout(async () => {
+    state.botTimer = null;
+    const room = state.room;
+    if (!room || !room.round) return;
+    if (action.type === 'bid' && room.round.currentBidder === action.seat) {
+      const hand = room.round.hands[action.seat] || [];
+      await submitBid(smartBotBid(hand), action.seat);
+    } else if (action.type === 'play' && room.round.currentPlayer === action.seat) {
+      const hand = room.round.hands[action.seat] || [];
+      const card = smartBotPlay(hand, room.round.currentTrick, action.seat);
+      if (card) await playCard(card, action.seat);
+    }
+  }, 1300);
 }
 
 async function sendChat(text) {
   if (!text.trim() || !state.roomCode) return;
-  const chatRef = push(ref(db, `rooms/${state.roomCode}/chat`));
-  await set(chatRef, {
-    seat: state.mySeat, name: state.myName,
-    text: text.trim(), time: Date.now(),
-  });
+  const cr = push(ref(db, `rooms/${state.roomCode}/chat`));
+  await set(cr, { seat: state.mySeat, name: state.myName, text: text.trim(), time: Date.now() });
 }
 
 function subscribeRoom() {
@@ -851,8 +850,21 @@ function subscribeRoom() {
     if (room.status === 'lobby') state.screen = 'lobby';
     else if (room.status === 'finished') state.screen = 'gameover';
     else state.screen = 'game';
+
+    // Auto-advance round logic (staggered by seat)
+    if (room.round?.showSummary && room.round.lastSummary && room.status === 'playing') {
+      if (state.advanceScheduled !== room.round.number) {
+        state.advanceScheduled = room.round.number;
+        const delay = 6000 + ((state.mySeat || 1) - 1) * 350;
+        setTimeout(() => tryAdvanceRound(state.advanceScheduled), delay);
+      }
+    } else if (!room.round?.showSummary) {
+      state.advanceScheduled = null;
+    }
+
     render();
     startTurnTimer();
+    maybeBotAct();
   });
   roomUnsubscribe = () => off(roomRef);
 }
@@ -862,6 +874,7 @@ function startTurnTimer() {
   const room = state.room;
   if (!room || !room.round || !room.round.turnStartTime) return;
   if (room.status !== 'bidding' && room.status !== 'playing') return;
+  if (room.round.showSummary) return;
   timerInterval = setInterval(updateTimerDisplay, 250);
   updateTimerDisplay();
 }
@@ -869,10 +882,10 @@ function startTurnTimer() {
 function updateTimerDisplay() {
   const room = state.room;
   if (!room || !room.round) return;
+  if (room.round.showSummary) { document.querySelectorAll('.timer-ring').forEach(el => el.style.display = 'none'); return; }
   const elapsed = (Date.now() - room.round.turnStartTime) / 1000;
   const remaining = Math.max(0, 45 - elapsed);
   const activeSeat = room.status === 'bidding' ? room.round.currentBidder : room.round.currentPlayer;
-
   document.querySelectorAll('.timer-ring').forEach(el => {
     const seat = +el.dataset.seat;
     if (seat === activeSeat) {
@@ -885,11 +898,8 @@ function updateTimerDisplay() {
       circ.style.strokeDashoffset = offset;
       text.textContent = Math.ceil(remaining);
       el.classList.toggle('urgent', remaining < 10);
-    } else {
-      el.style.display = 'none';
-    }
+    } else { el.style.display = 'none'; }
   });
-
   if (remaining === 0 && activeSeat === state.mySeat && !state.pendingAuto) {
     state.pendingAuto = true;
     autoPlayIfTurn().finally(() => { state.pendingAuto = false; });
@@ -898,9 +908,7 @@ function updateTimerDisplay() {
 
 function toast(msg) {
   document.querySelectorAll('.toast').forEach(t => t.remove());
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2800);
 }
@@ -943,6 +951,8 @@ function renderLobby() {
   const room = state.room || {};
   const players = room.players || {};
   const seats = [1, 2, 3, 4];
+  const filledCount = Object.values(players).filter(p => p).length;
+  const isHost = state.myUid === room.host;
   return `
   <div class="screen">
     <div class="lobby-wrap">
@@ -956,8 +966,9 @@ function renderLobby() {
           const p = players[s];
           const team = teamOfSeat(s);
           const isMine = state.mySeat === s;
+          const botFlag = isBot(p);
           return `
-          <div class="seat ${p ? 'filled' : ''} ${isMine ? 'mine' : ''}" data-seat="${s}">
+          <div class="seat ${p ? 'filled' : ''} ${isMine ? 'mine' : ''} ${botFlag ? 'bot' : ''}" data-seat="${s}">
             <span class="team-badge team-${team}">Team ${team}</span>
             <div class="seat-label">Seat ${s}</div>
             ${p ? `<div class="seat-name">${escapeHtml(p.name)}</div>` 
@@ -971,9 +982,10 @@ function renderLobby() {
           <div class="theme-opt ${state.cardTheme === t ? 'selected' : ''}" data-theme="${t}">A♠</div>
         `).join('')}
       </div>
-      <button class="btn btn-primary" id="startBtn" ${Object.values(players).filter(p=>p).length === 4 ? '' : 'disabled'}>
-        ${Object.values(players).filter(p=>p).length === 4 ? '🎴 Game Shuru Koro' : `${Object.values(players).filter(p=>p).length}/4 Player`}
+      <button class="btn btn-primary" id="startBtn" ${filledCount === 4 ? '' : 'disabled'}>
+        ${filledCount === 4 ? '🎴 Game Shuru Koro' : `${filledCount}/4 Player`}
       </button>
+      ${isHost && filledCount < 4 ? `<button class="btn btn-bot" id="addBotsBtn">🤖 Add 3 Bots (Testing)</button>` : ''}
       <button class="btn btn-secondary" id="leaveBtn">Beriye Jao</button>
     </div>
   </div>`;
@@ -986,7 +998,6 @@ function renderGame() {
   const players = room.players || {};
   const scores = room.scores || { A: 0, B: 0 };
   const theme = state.cardTheme;
-
   const myHand = (round.hands && round.hands[state.mySeat]) || [];
   const validCards = round.currentTrick ? validPlays(myHand, round.currentTrick) : myHand;
   const isMyTurn = (room.status === 'playing' && round.currentPlayer === state.mySeat);
@@ -1038,13 +1049,8 @@ function renderGame() {
     </div>
 
     <div class="chat-panel ${state.showChat ? 'show' : ''}">
-      <div class="chat-header">
-        <h3>Chat</h3>
-        <button class="menu-btn" id="closeChat">✕</button>
-      </div>
-      <div class="chat-messages" id="chatMessages">
-        ${renderChatMessages(room.chat || {}, players)}
-      </div>
+      <div class="chat-header"><h3>Chat</h3><button class="menu-btn" id="closeChat">✕</button></div>
+      <div class="chat-messages" id="chatMessages">${renderChatMessages(room.chat || {}, players)}</div>
       <div class="chat-input-wrap">
         <input type="text" id="chatInput" placeholder="Type..." maxlength="200">
         <button id="sendChat">→</button>
@@ -1063,9 +1069,7 @@ function renderPlayerPos(seat, players, round, status) {
   const tricks = round.tricks ? round.tricks[seat] || 0 : 0;
   const isActive = (status === 'bidding' && round.currentBidder === seat) || (status === 'playing' && round.currentPlayer === seat);
   const handCount = round.hands ? (round.hands[seat] || []).length : 13;
-
-  const wonClass = bid != null ? (tricks > bid + 1 || (tricks < bid && handCount === 0) ? 'over' : (tricks === bid || tricks === bid + 1 ? 'good' : '')) : '';
-
+  const wonClass = bid != null ? (tricks > bid + 1 ? 'over' : (tricks === bid || tricks === bid + 1 ? 'good' : '')) : '';
   return `
   <div class="player-pos ${pos}">
     ${pos === 'top' ? renderOppHand(handCount, pos) : ''}
@@ -1106,7 +1110,7 @@ function cardHtml(card, theme) {
   const classes = ['card', `theme-${theme}`, `suit-${s}`];
   if (isRed) classes.push('red-suit');
   return `
-  <div class="${classes.join(' ')}" data-card-inner="${card}">
+  <div class="${classes.join(' ')}">
     <div class="top"><div class="rank">${display}</div><div class="suit-corner">${sym}</div></div>
     <div class="center-suit">${sym}</div>
     <div class="bottom"><div class="rank">${display}</div><div class="suit-corner">${sym}</div></div>
@@ -1122,9 +1126,7 @@ function renderBidModal(round, players) {
       <div class="sub">Min 2 · Koto trick winabe?</div>
       ${otherBids ? `<div class="sub" style="color:var(--accent);">${otherBids}</div>` : ''}
       <div class="bid-options">
-        ${Array.from({length: 12}, (_, i) => i + 2).map(n => `
-          <button class="bid-btn" data-bid="${n}">${n}</button>
-        `).join('')}
+        ${Array.from({length: 12}, (_, i) => i + 2).map(n => `<button class="bid-btn" data-bid="${n}">${n}</button>`).join('')}
       </div>
     </div>
   </div>`;
@@ -1150,76 +1152,77 @@ function renderRoundSummary(summary, players) {
         <div style="color:var(--teamA);">A: ${summary.totalA}</div>
         <div style="color:var(--teamB);">B: ${summary.totalB}</div>
       </div>
-      <div class="sub">Next round in 6 sec...</div>
+      <div class="sub">Next round shuru hochche...</div>
     </div>
   </div>`;
 }
 
 function renderScoreSheet(history, players, scores) {
-  if (!history.length) {
-    return `
-    <div class="modal-overlay">
-      <div class="modal">
-        <h2>📊 Score Sheet</h2>
-        <div class="sub" style="margin-top:20px;">Ekhono kono round shesh hoi nai</div>
-        <button class="btn btn-secondary" id="closeScoreSheet" style="margin-top:20px;">Bondho Koro</button>
-      </div>
-    </div>`;
-  }
-  const seatNames = [1,2,3,4].map(s => players[s]?.name || 'S'+s);
+  const teamATotal = scores.A;
+  const teamBTotal = scores.B;
+  const diff = +(teamATotal - teamBTotal).toFixed(1);
+  const playerTotals = [1,2,3,4].map(s => +history.reduce((acc, h) => acc + (h.seatScores[s] || 0), 0).toFixed(1));
+
   return `
   <div class="modal-overlay">
-    <div class="modal" style="max-width: 540px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h2 style="font-size:20px;">📊 Score Sheet</h2>
+    <div class="modal sheet-modal">
+      <div class="sheet-header">
+        <h2>📊 Score Sheet</h2>
         <button class="menu-btn" id="closeScoreSheet">✕</button>
       </div>
-      <div style="overflow-x:auto;">
-      <table class="score-table">
-        <thead>
-          <tr>
-            <th>R</th>
-            <th style="color:var(--teamA);">${escapeHtml(seatNames[0])}</th>
-            <th style="color:var(--teamB);">${escapeHtml(seatNames[1])}</th>
-            <th style="color:var(--teamA);">${escapeHtml(seatNames[2])}</th>
-            <th style="color:var(--teamB);">${escapeHtml(seatNames[3])}</th>
-            <th>Σ Bid</th>
-            <th class="team-A-cell">A</th>
-            <th class="team-B-cell">B</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${history.map(h => `
+      ${history.length === 0 ? `
+        <div style="padding:20px; color:var(--text-dim); text-align:center;">Ekhono kono round shesh hoi nai</div>
+      ` : `
+      <div class="sheet-wrap">
+        <table class="sheet">
+          <thead>
             <tr>
-              <td>${h.round}</td>
-              ${[1,2,3,4].map(s => {
-                const sc = h.seatScores[s];
-                const cls = sc < 0 ? 'neg' : (sc % 1 !== 0 ? 'bonus' : '');
-                return `<td class="${cls}">${sc > 0 ? '+' : ''}${sc}</td>`;
-              }).join('')}
-              <td>${h.sumBids}</td>
-              <td class="team-A-cell">${h.totalA}</td>
-              <td class="team-B-cell">${h.totalB}</td>
+              <th class="row-header"></th>
+              <th class="team-a-col">${escapeHtml(players[1]?.name || 'P1')}</th>
+              <th class="team-b-col">${escapeHtml(players[2]?.name || 'P2')}</th>
+              <th class="team-a-col">${escapeHtml(players[3]?.name || 'P3')}</th>
+              <th class="team-b-col">${escapeHtml(players[4]?.name || 'P4')}</th>
+              <th>Sum of Call</th>
             </tr>
-          `).join('')}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td>Σ</td>
-            ${[1,2,3,4].map(s => {
-              const total = history.reduce((acc, h) => acc + (h.seatScores[s] || 0), 0);
-              return `<td>${+total.toFixed(1)}</td>`;
-            }).join('')}
-            <td>-</td>
-            <td class="team-A-cell">${scores.A}</td>
-            <td class="team-B-cell">${scores.B}</td>
-          </tr>
-        </tfoot>
-      </table>
+          </thead>
+          <tbody>
+            ${history.map(h => `
+              <tr>
+                <td class="row-header">${h.round}</td>
+                ${[1,2,3,4].map(s => {
+                  const sc = h.seatScores[s];
+                  let cls = '';
+                  if (sc < 0) cls = 'cell-neg';
+                  else if (sc >= 5) cls = 'cell-high';
+                  return `<td class="${cls}">${sc}</td>`;
+                }).join('')}
+                <td class="sum-cell">${h.sumBids}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="row-header">Σ</td>
+              ${playerTotals.map(t => `<td>${t}</td>`).join('')}
+              <td>-</td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
-      <div style="margin-top:14px; font-size:11px; color:var(--text-dim); display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
-        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(231,76,60,0.25); border-radius:3px;"></span> Bid miss</span>
-        <span><span style="display:inline-block; width:10px; height:10px; background:rgba(46,204,113,0.18); border-radius:3px;"></span> +1 Bonus</span>
+      `}
+      <div class="team-summary">
+        <div class="ts-cell ts-team-1">
+          <div class="label">Team A · ${escapeHtml(players[1]?.name || 'P1')} + ${escapeHtml(players[3]?.name || 'P3')}</div>
+          <div class="value">${teamATotal}</div>
+        </div>
+        <div class="ts-cell ts-team-2">
+          <div class="label">Team B · ${escapeHtml(players[2]?.name || 'P2')} + ${escapeHtml(players[4]?.name || 'P4')}</div>
+          <div class="value">${teamBTotal}</div>
+        </div>
+        <div class="ts-cell ts-diff">
+          <div class="label">Difference</div>
+          <div class="value">${Math.abs(diff)}</div>
+        </div>
       </div>
     </div>
   </div>`;
@@ -1263,8 +1266,7 @@ function renderChatMessages(chat, players) {
     const isMine = m.seat === state.mySeat;
     const team = m.seat ? teamOfSeat(m.seat) : null;
     return `<div class="chat-msg ${isMine ? 'mine' : (team ? 'team-'+team : '')}">
-      ${!isMine ? `<span class="author">${escapeHtml(m.name)}</span>` : ''}
-      ${escapeHtml(m.text)}
+      ${!isMine ? `<span class="author">${escapeHtml(m.name)}</span>` : ''}${escapeHtml(m.text)}
     </div>`;
   }).join('');
 }
@@ -1297,6 +1299,7 @@ function bindEvents() {
       el.onclick = () => changeTheme(el.dataset.theme);
     });
     if ($('startBtn')) $('startBtn').onclick = startGame;
+    if ($('addBotsBtn')) $('addBotsBtn').onclick = addBots;
     if ($('copyCode')) $('copyCode').onclick = () => {
       const url = `${location.origin}${location.pathname}?room=${state.roomCode}`;
       navigator.clipboard.writeText(url);
@@ -1311,39 +1314,22 @@ function bindEvents() {
   }
 
   if (state.screen === 'game') {
-    document.querySelectorAll('.bid-btn').forEach(el => {
-      el.onclick = () => submitBid(+el.dataset.bid);
-    });
+    document.querySelectorAll('.bid-btn').forEach(el => { el.onclick = () => submitBid(+el.dataset.bid); });
     document.querySelectorAll('.my-hand .card-wrap').forEach(el => {
-      const handler = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        playCard(el.dataset.card);
-      };
-      el.addEventListener('click', handler);
-      el.addEventListener('touchend', handler);
+      el.onclick = () => playCard(el.dataset.card);
     });
     if ($('toggleChat')) $('toggleChat').onclick = () => { state.showChat = !state.showChat; render(); };
     if ($('closeChat')) $('closeChat').onclick = () => { state.showChat = false; render(); };
     if ($('toggleScoreSheet')) $('toggleScoreSheet').onclick = () => { state.showScoreSheet = true; render(); };
     if ($('closeScoreSheet')) $('closeScoreSheet').onclick = () => { state.showScoreSheet = false; render(); };
-    if ($('sendChat')) $('sendChat').onclick = () => {
-      sendChat($('chatInput').value);
-      $('chatInput').value = '';
-    };
-    if ($('chatInput')) $('chatInput').onkeypress = e => {
-      if (e.key === 'Enter') { sendChat(e.target.value); e.target.value = ''; }
-    };
-    const cm = $('chatMessages');
-    if (cm) cm.scrollTop = cm.scrollHeight;
+    if ($('sendChat')) $('sendChat').onclick = () => { sendChat($('chatInput').value); $('chatInput').value = ''; };
+    if ($('chatInput')) $('chatInput').onkeypress = e => { if (e.key === 'Enter') { sendChat(e.target.value); e.target.value = ''; } };
+    const cm = $('chatMessages'); if (cm) cm.scrollTop = cm.scrollHeight;
   }
 
   if (state.screen === 'gameover') {
     if ($('newGameBtn')) $('newGameBtn').onclick = async () => {
-      await update(ref(db, `rooms/${state.roomCode}`), {
-        status: 'lobby', scores: { A: 0, B: 0 },
-        history: null, round: null, winner: null,
-      });
+      await update(ref(db, `rooms/${state.roomCode}`), { status: 'lobby', scores: { A: 0, B: 0 }, history: null, round: null, winner: null });
       state.showScoreSheet = false;
     };
     if ($('viewSheetBtn')) $('viewSheetBtn').onclick = () => { state.showScoreSheet = true; render(); };
@@ -1356,9 +1342,7 @@ const urlParams = new URLSearchParams(location.search);
 const joinFromUrl = urlParams.get('room');
 if (joinFromUrl) {
   state.roomCode = joinFromUrl.toUpperCase();
-  if (state.myName) {
-    joinRoom(state.roomCode);
-  }
+  if (state.myName) joinRoom(state.roomCode);
 }
 render();
 </script>
