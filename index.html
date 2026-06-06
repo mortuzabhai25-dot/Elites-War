@@ -286,6 +286,37 @@
   .timer-ring.urgent .progress-ring { stroke: var(--bad); }
   .timer-ring .time-text { fill: var(--text); font-size: 14px; font-weight: bold; text-anchor: middle; transform: rotate(90deg); transform-origin: 21px 21px; }
 
+  /* BID PANEL (floating, no overlay so cards stay visible) */
+  .bid-panel {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -55%);
+    background: linear-gradient(145deg, rgba(28,37,51,0.97), rgba(19,26,36,0.97));
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 16px;
+    z-index: 50;
+    max-width: 360px;
+    width: calc(100% - 24px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+    text-align: center;
+  }
+  .bid-panel h2 { font-size: 18px; margin-bottom: 6px; }
+  .bid-panel .sub { color: var(--text-dim); font-size: 12px; margin-bottom: 10px; }
+  .bid-panel .bid-options { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+  .bid-panel .bid-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text); padding: 10px 0; border-radius: 8px;
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .bid-panel .bid-btn:hover, .bid-panel .bid-btn:active { background: var(--accent); color: #1a1a1a; transform: scale(1.05); }
+
+  .countdown-text {
+    display: inline-block; min-width: 18px;
+    color: var(--accent); font-weight: 700;
+    font-size: 18px; padding: 0 2px;
+  }
+
   /* MODAL */
   .modal-overlay {
     position: absolute; inset: 0;
@@ -745,6 +776,7 @@ async function endRound(tricks) {
     scores: newScores, history,
     'round/showSummary': true,
     'round/lastSummary': history[history.length - 1],
+    'round/nextRoundAt': Date.now() + 5000,
   };
   if (targetReached) { updates['status'] = 'finished'; updates['winner'] = newScores.A > newScores.B ? 'A' : 'B'; }
   await update(ref(db, `rooms/${state.roomCode}`), updates);
@@ -845,6 +877,16 @@ setInterval(() => {
   }
 }, 4000);
 
+// Countdown text updater for round summary
+setInterval(() => {
+  const el = document.querySelector('.countdown-text');
+  if (!el) return;
+  const t = state.room?.round?.nextRoundAt;
+  if (!t) return;
+  const remaining = Math.max(0, Math.ceil((t - Date.now()) / 1000));
+  el.textContent = remaining;
+}, 250);
+
 async function sendChat(text) {
   if (!text.trim() || !state.roomCode) return;
   const cr = push(ref(db, `rooms/${state.roomCode}/chat`));
@@ -868,12 +910,15 @@ function subscribeRoom() {
     else if (room.status === 'finished') state.screen = 'gameover';
     else state.screen = 'game';
 
-    // Auto-advance round logic (staggered by seat)
+    // Auto-advance round logic (timestamp-based, staggered by seat)
     if (room.round?.showSummary && room.round.lastSummary && room.status === 'playing') {
       if (state.advanceScheduled !== room.round.number) {
-        state.advanceScheduled = room.round.number;
-        const delay = 6000 + ((state.mySeat || 1) - 1) * 350;
-        setTimeout(() => tryAdvanceRound(state.advanceScheduled), delay);
+        const targetRoundNum = room.round.number;
+        state.advanceScheduled = targetRoundNum;
+        const nextAt = room.round.nextRoundAt || (Date.now() + 5000);
+        const seatOffset = ((state.mySeat || 1) - 1) * 300;
+        const delay = Math.max(200, (nextAt - Date.now()) + seatOffset);
+        setTimeout(() => tryAdvanceRound(targetRoundNum), delay);
       }
     } else if (!room.round?.showSummary) {
       state.advanceScheduled = null;
@@ -1142,14 +1187,12 @@ function cardHtml(card, theme) {
 function renderBidModal(round, players) {
   const otherBids = round.bids ? Object.entries(round.bids).filter(([s,b]) => b!=null).map(([s,b]) => `${escapeHtml(players[s]?.name || 'S'+s)}: ${b}`).join(' · ') : '';
   return `
-  <div class="modal-overlay">
-    <div class="modal">
-      <h2>🎯 Bid Koro</h2>
-      <div class="sub">Min 2 · Koto trick winabe?</div>
-      ${otherBids ? `<div class="sub" style="color:var(--accent);">${otherBids}</div>` : ''}
-      <div class="bid-options">
-        ${Array.from({length: 12}, (_, i) => i + 2).map(n => `<button class="bid-btn" data-bid="${n}">${n}</button>`).join('')}
-      </div>
+  <div class="bid-panel">
+    <h2>🎯 Bid Koro</h2>
+    <div class="sub">Hand dekho niche · Min 2</div>
+    ${otherBids ? `<div class="sub" style="color:var(--accent);">${otherBids}</div>` : ''}
+    <div class="bid-options">
+      ${Array.from({length: 12}, (_, i) => i + 2).map(n => `<button class="bid-btn" data-bid="${n}">${n}</button>`).join('')}
     </div>
   </div>`;
 }
@@ -1174,7 +1217,7 @@ function renderRoundSummary(summary, players) {
         <div style="color:var(--teamA);">A: ${summary.totalA}</div>
         <div style="color:var(--teamB);">B: ${summary.totalB}</div>
       </div>
-      <div class="sub">Next round shuru hochche...</div>
+      <div class="sub">Next round shuru hobe <span class="countdown-text">5</span> sec por...</div>
     </div>
   </div>`;
 }
@@ -1370,4 +1413,3 @@ render();
 </script>
 </body>
 </html>
-
