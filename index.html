@@ -189,11 +189,16 @@
     transform: translate(-50%, -50%);
     width: 260px; height: 240px; pointer-events: none;
   }
-  .trick-card { position: absolute; animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); animation-fill-mode: backwards; }
-  .trick-card.from-bottom { bottom: 8px; left: 50%; transform: translateX(-50%); animation-name: fly-bottom; }
-  .trick-card.from-top { top: 8px; left: 50%; transform: translateX(-50%); animation-name: fly-top; }
-  .trick-card.from-left { left: 8px; top: 50%; transform: translateY(-50%); animation-name: fly-left; }
-  .trick-card.from-right { right: 8px; top: 50%; transform: translateY(-50%); animation-name: fly-right; }
+  .trick-card { position: absolute; }
+  .trick-card.from-bottom { bottom: 8px; left: 50%; transform: translateX(-50%); }
+  .trick-card.from-top { top: 8px; left: 50%; transform: translateX(-50%); }
+  .trick-card.from-left { left: 8px; top: 50%; transform: translateY(-50%); }
+  .trick-card.from-right { right: 8px; top: 50%; transform: translateY(-50%); }
+  .trick-card.animate { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); animation-fill-mode: backwards; }
+  .trick-card.animate.from-bottom { animation-name: fly-bottom; }
+  .trick-card.animate.from-top { animation-name: fly-top; }
+  .trick-card.animate.from-left { animation-name: fly-left; }
+  .trick-card.animate.from-right { animation-name: fly-right; }
   .trick-card.winning { box-shadow: 0 0 28px 4px rgba(212,175,55,0.9); border-radius: 8px; }
   @keyframes fly-bottom {
     from { transform: translateX(-50%) translateY(140px) rotate(-8deg) scale(0.85); opacity: 0; }
@@ -688,6 +693,7 @@ async function playCard(card, asSeat = null) {
     const newTricks = { ...round.tricks, [winner]: (round.tricks[winner] || 0) + 1 };
     updates['round/tricks'] = newTricks;
     updates['round/lastTrickWinner'] = winner;
+    updates['round/currentPlayer'] = null;
     await update(ref(db, `rooms/${state.roomCode}`), updates);
 
     setTimeout(async () => {
@@ -817,16 +823,27 @@ async function maybeBotAct() {
     state.botTimer = null;
     const room = state.room;
     if (!room || !room.round) return;
-    if (action.type === 'bid' && room.round.currentBidder === action.seat) {
-      const hand = room.round.hands[action.seat] || [];
-      await submitBid(smartBotBid(hand), action.seat);
-    } else if (action.type === 'play' && room.round.currentPlayer === action.seat) {
-      const hand = room.round.hands[action.seat] || [];
-      const card = smartBotPlay(hand, room.round.currentTrick, action.seat);
-      if (card) await playCard(card, action.seat);
-    }
+    try {
+      if (action.type === 'bid' && room.round.currentBidder === action.seat) {
+        const hand = room.round.hands[action.seat] || [];
+        await submitBid(smartBotBid(hand), action.seat);
+      } else if (action.type === 'play' && room.round.currentPlayer === action.seat) {
+        const hand = room.round.hands[action.seat] || [];
+        const card = smartBotPlay(hand, room.round.currentTrick, action.seat);
+        if (card) await playCard(card, action.seat);
+      }
+    } catch (e) { console.error('Bot action error:', e); }
+    // Safety re-trigger — ensures bot chain doesn't break
+    setTimeout(() => maybeBotAct(), 150);
   }, 1300);
 }
+
+// Safety net: periodic check for stuck bots
+setInterval(() => {
+  if (state.room && state.myUid === state.room.host && !state.botTimer) {
+    maybeBotAct();
+  }
+}, 4000);
 
 async function sendChat(text) {
   if (!text.trim() || !state.roomCode) return;
@@ -1025,11 +1042,16 @@ function renderGame() {
       ${[1,2,3,4].map(seat => renderPlayerPos(seat, players, round, room.status)).join('')}
 
       <div class="trick-area">
-        ${round.currentTrick && round.currentTrick.plays ? Object.entries(round.currentTrick.plays).map(([seat, card]) => {
-          const pos = getPosition(+seat);
-          const winningClass = (lastWinner && +seat === lastWinner) ? 'winning' : '';
-          return `<div class="trick-card from-${pos} ${winningClass}">${cardHtml(card, theme)}</div>`;
-        }).join('') : ''}
+        ${round.currentTrick && round.currentTrick.plays ? (() => {
+          const order = round.currentTrick.order || [];
+          const lastSeat = order[order.length - 1];
+          return Object.entries(round.currentTrick.plays).map(([seat, card]) => {
+            const pos = getPosition(+seat);
+            const winningClass = (lastWinner && +seat === lastWinner) ? 'winning' : '';
+            const animateClass = (+seat === lastSeat) ? 'animate' : '';
+            return `<div class="trick-card from-${pos} ${animateClass} ${winningClass}">${cardHtml(card, theme)}</div>`;
+          }).join('');
+        })() : ''}
       </div>
 
       <div class="my-hand">
@@ -1348,3 +1370,4 @@ render();
 </script>
 </body>
 </html>
+
