@@ -651,16 +651,24 @@ async function startGame() {
 async function beginNewRound(roundNum) {
   const hands = deal();
   const dealer = ((roundNum - 1) % 4) + 1;
-  const firstBidder = (dealer % 4) + 1;
+  const firstPlayer = (dealer % 4) + 1;
+  const isNoBidRound = (roundNum === 1);
   const roundData = {
-    number: roundNum, dealer, hands, bids: {},
-    currentBidder: firstBidder, currentPlayer: null,
+    number: roundNum, dealer, hands,
+    noBid: isNoBidRound,
+    bids: isNoBidRound ? { 1: 0, 2: 0, 3: 0, 4: 0 } : {},
+    currentBidder: isNoBidRound ? null : firstPlayer,
+    currentPlayer: isNoBidRound ? firstPlayer : null,
     tricks: { 1: 0, 2: 0, 3: 0, 4: 0 },
-    currentTrick: null,
+    currentTrick: isNoBidRound ? { leadSuit: '', plays: {}, order: [] } : null,
     turnStartTime: Date.now(),
     showSummary: false,
   };
-  await update(ref(db, `rooms/${state.roomCode}`), { status: 'bidding', round: roundData });
+  await update(ref(db, `rooms/${state.roomCode}`), {
+    status: isNoBidRound ? 'playing' : 'bidding',
+    round: roundData
+  });
+  console.log('[CB] New round started:', roundNum, isNoBidRound ? '(Free Hand)' : '(Bidding)');
 }
 
 async function submitBid(bid, asSeat = null) {
@@ -725,20 +733,28 @@ async function playCard(card, asSeat = null) {
     updates['round/tricks'] = newTricks;
     updates['round/lastTrickWinner'] = winner;
     updates['round/currentPlayer'] = null;
+    updates['round/trickCompleteAt'] = Date.now() + 1800;
     await update(ref(db, `rooms/${state.roomCode}`), updates);
+    console.log('[CB] Trick complete. Winner seat:', winner, 'Tricks now:', newTricks);
 
     setTimeout(async () => {
-      const handsNow = (await get(ref(db, `rooms/${state.roomCode}/round/hands`))).val();
-      const totalLeft = [1,2,3,4].reduce((s, x) => s + (handsNow[x]?.length || 0), 0);
-      if (totalLeft === 0) {
-        await endRound(newTricks);
-      } else {
-        await update(ref(db, `rooms/${state.roomCode}`), {
-          'round/currentTrick': { leadSuit: '', plays: {}, order: [] },
-          'round/currentPlayer': winner,
-          'round/turnStartTime': Date.now(),
-          'round/lastTrickWinner': null,
-        });
+      try {
+        const handsNow = (await get(ref(db, `rooms/${state.roomCode}/round/hands`))).val() || {};
+        const totalLeft = [1,2,3,4].reduce((s, x) => s + (handsNow[x]?.length || 0), 0);
+        console.log('[CB] Primary cleanup running. Cards left:', totalLeft);
+        if (totalLeft === 0) {
+          await endRound(newTricks);
+        } else {
+          await update(ref(db, `rooms/${state.roomCode}`), {
+            'round/currentTrick': { leadSuit: '', plays: {}, order: [] },
+            'round/currentPlayer': winner,
+            'round/turnStartTime': Date.now(),
+            'round/lastTrickWinner': null,
+            'round/trickCompleteAt': null,
+          });
+        }
+      } catch (e) {
+        console.error('[CB] Primary trick cleanup failed:', e);
       }
     }, 1800);
   } else {
@@ -749,37 +765,48 @@ async function playCard(card, asSeat = null) {
 }
 
 async function endRound(tricks) {
-  const round = state.room.round;
-  const bids = round.bids;
-  const seatScores = {};
-  let teamADelta = 0, teamBDelta = 0;
-  for (let s = 1; s <= 4; s++) {
-    const score = calcRoundScore(bids[s], tricks[s]);
-    seatScores[s] = score;
-    if (teamOfSeat(s) === 'A') teamADelta += score; else teamBDelta += score;
-  }
-  const prevScores = state.room.scores || { A: 0, B: 0 };
-  const newScores = {
-    A: +(prevScores.A + teamADelta).toFixed(1),
-    B: +(prevScores.B + teamBDelta).toFixed(1),
-  };
-  const history = state.room.history || [];
-  history.push({
-    round: round.number, bids, tricks, seatScores,
-    sumBids: Object.values(bids).reduce((a, b) => a + b, 0),
-    deltaA: +teamADelta.toFixed(1), deltaB: +teamBDelta.toFixed(1),
-    totalA: newScores.A, totalB: newScores.B,
-  });
+  console.log('[CB] endRound called with tricks:', tricks);
+  try {
+    const round = state.room.round;
+    const bids = round.bids;
+    const isNoBidRound = round.noBid;
+    const seatScores = {};
+    let teamADelta = 0, teamBDelta = 0;
+    for (let s = 1; s <= 4; s++) {
+      const score = isNoBidRound ? (tricks[s] || 0) : calcRoundScore(bids[s], tricks[s]);
+      seatScores[s] = score;
+      if (teamOfSeat(s) === 'A') teamADelta += score; else teamBDelta += score;
+    }
+    const prevScores = state.room.scores || { A: 0, B: 0 };
+    const newScores = {
+      A: +(prevScores.A + teamADelta).toFixed(1),
+      B: +(prevScores.B + teamBDelta).toFixed(1),
+    };
+    const history = state.room.history || [];
+    history.push({
+      round: round.number, bids, tricks, seatScores,
+      noBid: isNoBidRound,
+      sumBids: isNoBidRound ? 0 : Object.values(bids).reduce((a, b) => a + b, 0),
+      deltaA: +teamADelta.toFixed(1), deltaB: +teamBDelta.toFixed(1),
+      totalA: newScores.A, totalB: newScores.B,
+    });
 
-  const targetReached = newScores.A >= 100 || newScores.B >= 100;
-  const updates = {
-    scores: newScores, history,
-    'round/showSummary': true,
-    'round/lastSummary': history[history.length - 1],
-    'round/nextRoundAt': Date.now() + 5000,
-  };
-  if (targetReached) { updates['status'] = 'finished'; updates['winner'] = newScores.A > newScores.B ? 'A' : 'B'; }
-  await update(ref(db, `rooms/${state.roomCode}`), updates);
+    const targetReached = newScores.A >= 100 || newScores.B >= 100;
+    const updates = {
+      scores: newScores, history,
+      'round/showSummary': true,
+      'round/lastSummary': history[history.length - 1],
+      'round/nextRoundAt': Date.now() + 5000,
+      'round/currentTrick': null,
+      'round/lastTrickWinner': null,
+      'round/trickCompleteAt': null,
+    };
+    if (targetReached) { updates['status'] = 'finished'; updates['winner'] = newScores.A > newScores.B ? 'A' : 'B'; }
+    await update(ref(db, `rooms/${state.roomCode}`), updates);
+    console.log('[CB] Round ended, summary written. Next at:', new Date(Date.now() + 5000).toLocaleTimeString());
+  } catch (e) {
+    console.error('[CB] endRound error:', e);
+  }
 }
 
 async function tryAdvanceRound(fromRoundNum) {
@@ -787,6 +814,35 @@ async function tryAdvanceRound(fromRoundNum) {
   const cur = snap.val();
   if (cur && cur.number === fromRoundNum && cur.showSummary) {
     await beginNewRound(fromRoundNum + 1);
+  }
+}
+
+async function doTrickCleanup(expectedKey) {
+  if (!state.room) return;
+  const round = state.room.round;
+  if (!round || !round.currentTrick) return;
+  const currentOrder = round.currentTrick.order || [];
+  if (currentOrder.length !== 4) return;
+  if (round.lastTrickWinner == null) return;
+  const currentKey = `${round.number}-${currentOrder.join(',')}`;
+  if (currentKey !== expectedKey) return;
+  console.warn('[CB] BACKUP cleanup running — primary setTimeout must have failed');
+  try {
+    const handsNow = (await get(ref(db, `rooms/${state.roomCode}/round/hands`))).val() || {};
+    const totalLeft = [1,2,3,4].reduce((s, x) => s + (handsNow[x]?.length || 0), 0);
+    if (totalLeft === 0) {
+      await endRound(round.tricks);
+    } else {
+      await update(ref(db, `rooms/${state.roomCode}`), {
+        'round/currentTrick': { leadSuit: '', plays: {}, order: [] },
+        'round/currentPlayer': round.lastTrickWinner,
+        'round/turnStartTime': Date.now(),
+        'round/lastTrickWinner': null,
+        'round/trickCompleteAt': null,
+      });
+    }
+  } catch (e) {
+    console.error('[CB] Backup trick cleanup failed:', e);
   }
 }
 
@@ -922,6 +978,19 @@ function subscribeRoom() {
       }
     } else if (!room.round?.showSummary) {
       state.advanceScheduled = null;
+    }
+
+    // BACKUP trick cleanup (host only) — fires if primary setTimeout failed
+    if (state.myUid === room.host && room.round?.currentTrick?.order?.length === 4 && room.round?.lastTrickWinner != null && !room.round?.showSummary) {
+      const cleanupKey = `${room.round.number}-${(room.round.currentTrick.order || []).join(',')}`;
+      if (state.trickCleanupKey !== cleanupKey) {
+        state.trickCleanupKey = cleanupKey;
+        const completeAt = room.round.trickCompleteAt || (Date.now() + 1800);
+        const delay = Math.max(2000, (completeAt - Date.now()) + 1500);
+        setTimeout(() => doTrickCleanup(cleanupKey), delay);
+      }
+    } else if (!room.round?.currentTrick?.order?.length) {
+      state.trickCleanupKey = null;
     }
 
     render();
