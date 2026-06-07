@@ -286,6 +286,36 @@
   .timer-ring.urgent .progress-ring { stroke: var(--bad); }
   .timer-ring .time-text { fill: var(--text); font-size: 14px; font-weight: bold; text-anchor: middle; transform: rotate(90deg); transform-origin: 21px 21px; }
 
+  /* ME-INFO (own bid + tricks display, above hand) */
+  .me-info {
+    position: absolute;
+    bottom: 132px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 4px 14px;
+    font-size: 12px;
+    z-index: 5;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    white-space: nowrap;
+    transition: all 0.3s;
+  }
+  .me-info.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(212,175,55,0.55);
+  }
+  .me-info .mi-bid { color: var(--accent); font-weight: 700; }
+  .me-info .mi-won { color: var(--text); font-weight: 600; }
+  .me-info .mi-sep { color: var(--text-dim); }
+  @media (max-width: 768px) {
+    .me-info { bottom: 108px; padding: 3px 10px; font-size: 11px; gap: 8px; }
+  }
+
   /* BID PANEL (floating, no overlay so cards stay visible) */
   .bid-panel {
     position: absolute;
@@ -551,7 +581,10 @@ function validPlays(hand, currentTrick) {
       const highestSpade = Math.max(...playedSpades);
       const higher = spades.filter(c => rankValue(c[0]) > highestSpade);
       if (higher.length > 0) return higher;
+      // Can't beat highest trump — free to play ANY card
+      return hand;
     }
+    // No trump played yet — must trump
     return spades;
   }
   return hand;
@@ -1168,6 +1201,19 @@ function renderGame() {
         })() : ''}
       </div>
 
+      ${state.mySeat ? (() => {
+        const myBid = round.bids && round.bids[state.mySeat];
+        const myWon = (round.tricks && round.tricks[state.mySeat]) || 0;
+        const bidLabel = round.noBid ? '<span class="mi-bid">FREE</span>' 
+          : (myBid != null ? `<span class="mi-bid">Bid ${myBid}</span>` 
+             : '<span style="color:var(--text-dim);">Waiting bid...</span>');
+        return `<div class="me-info ${isMyTurn ? 'active' : ''}">
+          ${bidLabel}
+          <span class="mi-sep">·</span>
+          <span class="mi-won">Won ${myWon}</span>
+        </div>`;
+      })() : ''}
+
       <div class="my-hand">
         ${myHand.map((c, i) => {
           const playable = isMyTurn && validCards.includes(c);
@@ -1205,14 +1251,17 @@ function renderPlayerPos(seat, players, round, status) {
   const tricks = round.tricks ? round.tricks[seat] || 0 : 0;
   const isActive = (status === 'bidding' && round.currentBidder === seat) || (status === 'playing' && round.currentPlayer === seat);
   const handCount = round.hands ? (round.hands[seat] || []).length : 13;
-  const wonClass = bid != null ? (tricks > bid + 1 ? 'over' : (tricks === bid || tricks === bid + 1 ? 'good' : '')) : '';
+  const wonClass = round.noBid ? '' : (bid != null ? (tricks > bid + 1 ? 'over' : (tricks === bid || tricks === bid + 1 ? 'good' : '')) : '');
+  const bidDisplay = round.noBid
+    ? '<span style="color:var(--accent); font-weight:600;">FREE</span>'
+    : (bid != null ? `<span class="bid">Bid ${bid}</span>` : '<span>...</span>');
   return `
   <div class="player-pos ${pos}">
     ${pos === 'top' ? renderOppHand(handCount, pos) : ''}
     <div class="player-info team-${team} ${isActive ? 'active' : ''}">
       <div class="name"><span class="offline-dot ${p.online ? '' : 'off'}"></span>${escapeHtml(p.name)}</div>
       <div class="stats">
-        ${bid != null ? `<span class="bid">Bid ${bid}</span>` : '<span>...</span>'}
+        ${bidDisplay}
         <span class="won ${wonClass}">Won ${tricks}</span>
       </div>
       <div class="timer-ring" data-seat="${seat}" style="display:none;">
